@@ -5,6 +5,7 @@ import {
     resendVerificationEmail,
     requestPasswordReset,
     resetPassword,
+    validateResetToken,
     verifyEmail
 } from "../services/auth.service";
 
@@ -104,6 +105,33 @@ export const forgotPasswordController = async (
         res.status(400).json({
             success: false,
             message: error?.message || "Password reset request failed"
+        });
+    }
+};
+
+export const validateResetTokenController = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const token = String(req.query.token || "");
+
+        if (!token) {
+            res.status(400).json({
+                success: false,
+                valid: false,
+                message: "Missing reset token"
+            });
+            return;
+        }
+
+        const result = await validateResetToken(token);
+        res.status(200).json(result);
+    } catch (error: any) {
+        res.status(400).json({
+            success: false,
+            valid: false,
+            message: error?.message || "Reset token validation failed"
         });
     }
 };

@@ -6,7 +6,7 @@ import { checkActiveAlerts } from "./services/alert-checker.service";
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
-const ALERT_CHECK_INTERVAL_MS = 1000 * 30; // 5 minutes
+const ALERT_CHECK_INTERVAL_MS = 1000 * 60 * 5; // 5 minutes
 
 const startServer = async (): Promise<void> => {
     try {

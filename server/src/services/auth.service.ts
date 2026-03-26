@@ -83,8 +83,8 @@ const sendVerificationEmail = async (
     email: string,
     rawToken: string
 ): Promise<void> => {
-    const apiUrl = process.env.API_URL || "http://localhost:5000";
-    const verifyLink = `${apiUrl}/api/auth/verify-email?token=${rawToken}`;
+    const appUrl = process.env.APP_URL || "http://localhost:5173";
+    const verifyLink = `${appUrl}/verify-email?token=${rawToken}`;
 
     await sendEmail({
         to: email,
@@ -347,6 +347,36 @@ export const requestPasswordReset = async (emailRaw: string) => {
     await sendResetPasswordEmail(email, rawToken);
 
     return genericResponse;
+};
+
+export const validateResetToken = async (tokenRaw: string) => {
+    const tokenHash = crypto.createHash("sha256").update(tokenRaw).digest("hex");
+
+    const user = await UserModel.findOne({
+        passwordResetTokenHash: tokenHash
+    });
+
+    if (!user) {
+        return {
+            success: true,
+            valid: false,
+            message: "Invalid or expired reset token"
+        };
+    }
+
+    if (!isResetTokenValid(user)) {
+        return {
+            success: true,
+            valid: false,
+            message: "Invalid or expired reset token"
+        };
+    }
+
+    return {
+        success: true,
+        valid: true,
+        message: "Reset token is valid"
+    };
 };
 
 export const resetPassword = async (

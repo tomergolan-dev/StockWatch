@@ -8,12 +8,13 @@ import {
     resetPasswordSchema
 } from "../validations/auth.validation";
 import {
-    forgotPasswordController,
-    loginController,
     registerController,
+    verifyEmailController,
     resendVerificationController,
+    loginController,
+    forgotPasswordController,
+    validateResetTokenController,
     resetPasswordController,
-    verifyEmailController
 } from "../controllers/auth.controller";
 
 const authRouter = Router();
@@ -40,6 +41,8 @@ authRouter.post(
     validate(forgotPasswordSchema),
     forgotPasswordController
 );
+
+authRouter.get("/validate-reset-token", validateResetTokenController);
 
 // Reset password using token + new password
 authRouter.post(
