@@ -133,7 +133,7 @@ function RegisterPage() {
             <div className="auth-card">
                 <div className="auth-card-header">
                     <p className="auth-eyebrow">Create Your Account</p>
-                    <h1 className="auth-title">Register</h1>
+                    <h1 className="auth-title">Sign Up</h1>
                     <p className="auth-description">
                         Create a StockWatch account to manage your watchlist, alerts, and notifications.
                     </p>
@@ -142,7 +142,7 @@ function RegisterPage() {
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <div className="auth-grid">
                         <div className="form-field">
-                            <label htmlFor="firstName">First name</label>
+                            <label htmlFor="firstName">First Name</label>
                             <input
                                 id="firstName"
                                 name="firstName"
@@ -156,7 +156,7 @@ function RegisterPage() {
                         </div>
 
                         <div className="form-field">
-                            <label htmlFor="lastName">Last name</label>
+                            <label htmlFor="lastName">Last Name</label>
                             <input
                                 id="lastName"
                                 name="lastName"
@@ -227,7 +227,7 @@ function RegisterPage() {
                     </div>
 
                     <div className="form-field">
-                        <label htmlFor="confirmPassword">Confirm password</label>
+                        <label htmlFor="confirmPassword">Verify Password</label>
 
                         <div className="password-input-wrapper">
                             <input
@@ -276,7 +276,7 @@ function RegisterPage() {
                     </button>
 
                     <p className="auth-footer-text">
-                        Already have an account? <Link to="/login">Login</Link>
+                        Already have an account? <Link to="/login">Sign in</Link>
                     </p>
                 </form>
             </div>

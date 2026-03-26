@@ -66,7 +66,7 @@ function LoginPage() {
             <div className="auth-card">
                 <div className="auth-card-header">
                     <p className="auth-eyebrow">StockWatch Access</p>
-                    <h1 className="auth-title">Login</h1>
+                    <h1 className="auth-title">Sign In</h1>
                     <p className="auth-description">
                         Sign in to manage your watchlist, alerts, and notifications.
                     </p>
@@ -120,16 +120,16 @@ function LoginPage() {
                         className="primary-button"
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? "Signing in..." : "Login"}
+                        {isSubmitting ? "Signing in..." : "Sign In"}
                     </button>
 
                     <div className="auth-footer-group">
                         <p className="auth-footer-text">
-                            Don&apos;t have an account? <Link to="/register">Register</Link>
+                            <Link to="/forgot-password">Forgot your password?</Link>
                         </p>
 
                         <p className="auth-footer-text">
-                            Forgot password? <Link to="/forgot-password">Reset it</Link>
+                            Don&apos;t have an account? <Link to="/register">Create Account</Link>
                         </p>
                     </div>
                 </form>

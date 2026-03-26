@@ -215,7 +215,7 @@ function ResetPasswordPage() {
                 {status === "form" ? (
                     <form className="auth-form" onSubmit={handleSubmit}>
                         <div className="form-field">
-                            <label htmlFor="password">New password</label>
+                            <label htmlFor="password">New Password</label>
 
                             <div className="password-input-wrapper">
                                 <input
@@ -257,7 +257,7 @@ function ResetPasswordPage() {
                         </div>
 
                         <div className="form-field">
-                            <label htmlFor="confirmPassword">Confirm new password</label>
+                            <label htmlFor="confirmPassword">Verify New Password</label>
 
                             <div className="password-input-wrapper">
                                 <input
