@@ -38,27 +38,27 @@ function ResetPasswordPage() {
     const passwordRules = useMemo<PasswordRule[]>(
         () => [
             {
-                label: "At least 8 characters",
+                label: "8+ characters",
                 isValid: form.password.length >= 8,
             },
             {
-                label: "At most 64 characters",
+                label: "Up to 64 characters",
                 isValid: form.password.length <= 64,
             },
             {
-                label: "At least one uppercase letter",
+                label: "Uppercase letter",
                 isValid: /[A-Z]/.test(form.password),
             },
             {
-                label: "At least one lowercase letter",
+                label: "Lowercase letter",
                 isValid: /[a-z]/.test(form.password),
             },
             {
-                label: "At least one number",
+                label: "Number",
                 isValid: /[0-9]/.test(form.password),
             },
             {
-                label: "At least one special character",
+                label: "Special character",
                 isValid: /[^A-Za-z0-9]/.test(form.password),
             },
         ],
@@ -82,9 +82,7 @@ function ResetPasswordPage() {
 
                 if (!data.valid) {
                     setStatus("invalid");
-                    setErrorMessage(
-                        data.message || "This reset link is invalid or has expired."
-                    );
+                    setErrorMessage(data.message || "This reset link is invalid or has expired.");
                     return;
                 }
 
@@ -108,7 +106,6 @@ function ResetPasswordPage() {
         void runValidation();
     }, [token]);
 
-    /* Update form fields when the user types */
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
 
@@ -120,7 +117,6 @@ function ResetPasswordPage() {
         setErrorMessage("");
     };
 
-    /* Submit the new password to the backend */
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setErrorMessage("");
@@ -173,24 +169,23 @@ function ResetPasswordPage() {
 
     return (
         <section className="auth-page">
-            <div className="auth-card">
-                <div className="auth-card-header">
-                    <p className="auth-eyebrow">Password Recovery</p>
+            <div className="auth-card modern-card">
+                <div className="auth-card-header center">
                     <h1 className="auth-title">Set New Password</h1>
-                    <p className="auth-description">
+                    <p className="auth-description auth-description-compact">
                         {status === "checking"
                             ? "Checking your reset link..."
                             : status === "success"
                                 ? successMessage
                                 : status === "invalid"
                                     ? errorMessage
-                                    : "Create a new password for your StockWatch account."}
+                                    : "Create a new password for your account."}
                     </p>
                 </div>
 
                 {status === "checking" ? (
                     <div className="auth-form">
-                        <button type="button" className="primary-button" disabled>
+                        <button type="button" className="primary-button large" disabled>
                             Validating link...
                         </button>
                     </div>
@@ -198,7 +193,7 @@ function ResetPasswordPage() {
 
                 {status === "invalid" ? (
                     <div className="auth-form">
-                        <Link to="/forgot-password" className="primary-button auth-link-button">
+                        <Link to="/forgot-password" className="primary-button auth-link-button large">
                             Request new reset link
                         </Link>
                     </div>
@@ -206,8 +201,8 @@ function ResetPasswordPage() {
 
                 {status === "success" ? (
                     <div className="auth-form">
-                        <Link to="/login" className="primary-button auth-link-button">
-                            Continue to login
+                        <Link to="/login" className="primary-button auth-link-button large">
+                            Continue to sign in
                         </Link>
                     </div>
                 ) : null}
@@ -215,14 +210,12 @@ function ResetPasswordPage() {
                 {status === "form" ? (
                     <form className="auth-form" onSubmit={handleSubmit}>
                         <div className="form-field">
-                            <label htmlFor="password">New Password</label>
-
                             <div className="password-input-wrapper">
                                 <input
                                     id="password"
                                     name="password"
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="Enter your new password"
+                                    placeholder="New password"
                                     value={form.password}
                                     onChange={handleChange}
                                     autoComplete="new-password"
@@ -240,15 +233,15 @@ function ResetPasswordPage() {
                             </div>
 
                             {form.password ? (
-                                <div className="password-rules">
+                                <div className="password-rules compact">
                                     {passwordRules.map((rule) => (
                                         <div
                                             key={rule.label}
                                             className={`password-rule ${rule.isValid ? "valid" : "invalid"}`}
                                         >
-                      <span className="password-rule-icon">
-                        {rule.isValid ? "✔" : "✕"}
-                      </span>
+                                            <span className="password-rule-icon">
+                                                {rule.isValid ? "✔" : "✕"}
+                                            </span>
                                             <span>{rule.label}</span>
                                         </div>
                                     ))}
@@ -257,14 +250,12 @@ function ResetPasswordPage() {
                         </div>
 
                         <div className="form-field">
-                            <label htmlFor="confirmPassword">Verify New Password</label>
-
                             <div className="password-input-wrapper">
                                 <input
                                     id="confirmPassword"
                                     name="confirmPassword"
                                     type={showConfirmPassword ? "text" : "password"}
-                                    placeholder="Re-enter your new password"
+                                    placeholder="Confirm new password"
                                     value={form.confirmPassword}
                                     onChange={handleChange}
                                     autoComplete="new-password"
@@ -298,14 +289,14 @@ function ResetPasswordPage() {
 
                         <button
                             type="submit"
-                            className="primary-button"
+                            className="primary-button large"
                             disabled={isSubmitting || !token}
                         >
                             {isSubmitting ? "Updating password..." : "Update password"}
                         </button>
 
                         <p className="auth-footer-text">
-                            Back to <Link to="/login">login</Link>
+                            Back to <Link to="/login">sign in</Link>
                         </p>
                     </form>
                 ) : null}

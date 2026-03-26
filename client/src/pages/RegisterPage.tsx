@@ -37,27 +37,27 @@ function RegisterPage() {
     const passwordRules = useMemo<PasswordRule[]>(
         () => [
             {
-                label: "At least 8 characters",
+                label: "8+ characters",
                 isValid: form.password.length >= 8,
             },
             {
-                label: "At most 64 characters",
+                label: "Up to 64 characters",
                 isValid: form.password.length <= 64,
             },
             {
-                label: "At least one uppercase letter",
+                label: "Uppercase letter",
                 isValid: /[A-Z]/.test(form.password),
             },
             {
-                label: "At least one lowercase letter",
+                label: "Lowercase letter",
                 isValid: /[a-z]/.test(form.password),
             },
             {
-                label: "At least one number",
+                label: "Number",
                 isValid: /[0-9]/.test(form.password),
             },
             {
-                label: "At least one special character",
+                label: "Special character",
                 isValid: /[^A-Za-z0-9]/.test(form.password),
             },
         ],
@@ -68,7 +68,6 @@ function RegisterPage() {
     const isConfirmPasswordValid =
         form.confirmPassword.length > 0 && form.password === form.confirmPassword;
 
-    /* Update form fields when the user types */
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
 
@@ -81,7 +80,6 @@ function RegisterPage() {
         setSuccessMessage("");
     };
 
-    /* Submit registration data after client-side validation */
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setErrorMessage("");
@@ -130,24 +128,19 @@ function RegisterPage() {
 
     return (
         <section className="auth-page">
-            <div className="auth-card">
-                <div className="auth-card-header">
-                    <p className="auth-eyebrow">Create Your Account</p>
+            <div className="auth-card auth-card-wide modern-card">
+                <div className="auth-card-header center">
                     <h1 className="auth-title">Sign Up</h1>
-                    <p className="auth-description">
-                        Create a StockWatch account to manage your watchlist, alerts, and notifications.
-                    </p>
                 </div>
 
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <div className="auth-grid">
                         <div className="form-field">
-                            <label htmlFor="firstName">First Name</label>
                             <input
                                 id="firstName"
                                 name="firstName"
                                 type="text"
-                                placeholder="Enter your first name"
+                                placeholder="First name"
                                 value={form.firstName}
                                 onChange={handleChange}
                                 autoComplete="given-name"
@@ -156,12 +149,11 @@ function RegisterPage() {
                         </div>
 
                         <div className="form-field">
-                            <label htmlFor="lastName">Last Name</label>
                             <input
                                 id="lastName"
                                 name="lastName"
                                 type="text"
-                                placeholder="Enter your last name"
+                                placeholder="Last name"
                                 value={form.lastName}
                                 onChange={handleChange}
                                 autoComplete="family-name"
@@ -171,12 +163,11 @@ function RegisterPage() {
                     </div>
 
                     <div className="form-field">
-                        <label htmlFor="email">Email</label>
                         <input
                             id="email"
                             name="email"
                             type="email"
-                            placeholder="Enter your email"
+                            placeholder="Email"
                             value={form.email}
                             onChange={handleChange}
                             autoComplete="email"
@@ -185,14 +176,12 @@ function RegisterPage() {
                     </div>
 
                     <div className="form-field">
-                        <label htmlFor="password">Password</label>
-
                         <div className="password-input-wrapper">
                             <input
                                 id="password"
                                 name="password"
                                 type={showPassword ? "text" : "password"}
-                                placeholder="Create a strong password"
+                                placeholder="Password"
                                 value={form.password}
                                 onChange={handleChange}
                                 autoComplete="new-password"
@@ -210,7 +199,7 @@ function RegisterPage() {
                         </div>
 
                         {form.password ? (
-                            <div className="password-rules">
+                            <div className="password-rules compact">
                                 {passwordRules.map((rule) => (
                                     <div
                                         key={rule.label}
@@ -227,14 +216,12 @@ function RegisterPage() {
                     </div>
 
                     <div className="form-field">
-                        <label htmlFor="confirmPassword">Verify Password</label>
-
                         <div className="password-input-wrapper">
                             <input
                                 id="confirmPassword"
                                 name="confirmPassword"
                                 type={showConfirmPassword ? "text" : "password"}
-                                placeholder="Re-enter your password"
+                                placeholder="Confirm password"
                                 value={form.confirmPassword}
                                 onChange={handleChange}
                                 autoComplete="new-password"
@@ -269,7 +256,7 @@ function RegisterPage() {
 
                     <button
                         type="submit"
-                        className="primary-button"
+                        className="primary-button large"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? "Creating account..." : "Create account"}

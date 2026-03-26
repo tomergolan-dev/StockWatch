@@ -21,7 +21,9 @@ function AppLayout() {
             <SideDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
 
             <main className="app-main">
-                <Outlet />
+                <div className="app-content">
+                    <Outlet />
+                </div>
             </main>
         </div>
     );

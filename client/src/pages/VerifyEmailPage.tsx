@@ -52,29 +52,28 @@ function VerifyEmailPage() {
 
     return (
         <section className="auth-page">
-            <div className="auth-card">
-                <div className="auth-card-header">
-                    <p className="auth-eyebrow">Email Verification</p>
+            <div className="auth-card modern-card">
+                <div className="auth-card-header center">
                     <h1 className="auth-title">Verify Email</h1>
-                    <p className="auth-description">{message}</p>
+                    <p className="auth-description auth-description-compact">{message}</p>
                 </div>
 
                 <div className="auth-form">
                     {status === "loading" ? (
-                        <button type="button" className="primary-button" disabled>
+                        <button type="button" className="primary-button large" disabled>
                             Verifying...
                         </button>
                     ) : null}
 
                     {status === "success" ? (
-                        <Link to="/login" className="primary-button auth-link-button">
-                            Continue to login
+                        <Link to="/login" className="primary-button auth-link-button large">
+                            Continue to sign in
                         </Link>
                     ) : null}
 
                     {status === "error" ? (
-                        <Link to="/register" className="primary-button auth-link-button">
-                            Back to register
+                        <Link to="/register" className="auth-secondary-button centered-link-button">
+                            Back to sign up
                         </Link>
                     ) : null}
                 </div>

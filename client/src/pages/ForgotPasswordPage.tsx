@@ -10,14 +10,12 @@ function ForgotPasswordPage() {
     const [successMessage, setSuccessMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    /* Update the email field */
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);
         setErrorMessage("");
         setSuccessMessage("");
     };
 
-    /* Submit the password reset request */
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setErrorMessage("");
@@ -52,23 +50,21 @@ function ForgotPasswordPage() {
 
     return (
         <section className="auth-page">
-            <div className="auth-card">
-                <div className="auth-card-header">
-                    <p className="auth-eyebrow">Password Recovery</p>
+            <div className="auth-card modern-card">
+                <div className="auth-card-header center">
                     <h1 className="auth-title">Forgot Password</h1>
-                    <p className="auth-description">
-                        Enter your email address and we will send you a password reset link.
+                    <p className="auth-description auth-description-compact">
+                        Enter your email to receive a reset link.
                     </p>
                 </div>
 
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <div className="form-field">
-                        <label htmlFor="email">Email</label>
                         <input
                             id="email"
                             name="email"
                             type="email"
-                            placeholder="Enter your email"
+                            placeholder="Email"
                             value={email}
                             onChange={handleChange}
                             autoComplete="email"
@@ -81,15 +77,21 @@ function ForgotPasswordPage() {
 
                     <button
                         type="submit"
-                        className="primary-button"
+                        className="primary-button large"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? "Sending reset link..." : "Send reset link"}
                     </button>
 
-                    <p className="auth-footer-text">
-                        Remembered your password? <Link to="/login">Back to login</Link>
-                    </p>
+                    <div className="auth-footer-group">
+                        <p className="auth-footer-text">
+                            Back to <Link to="/login">sign in</Link>
+                        </p>
+
+                        <p className="auth-footer-text">
+                            No account? <Link to="/register">Sign up</Link>
+                        </p>
+                    </div>
                 </form>
             </div>
         </section>

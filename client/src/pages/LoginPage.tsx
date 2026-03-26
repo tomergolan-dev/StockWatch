@@ -19,7 +19,6 @@ function LoginPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    /* Update form fields when the user types */
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
 
@@ -29,7 +28,6 @@ function LoginPage() {
         }));
     };
 
-    /* Submit login credentials and store the authenticated user */
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setErrorMessage("");
@@ -63,23 +61,18 @@ function LoginPage() {
 
     return (
         <section className="auth-page">
-            <div className="auth-card">
-                <div className="auth-card-header">
-                    <p className="auth-eyebrow">StockWatch Access</p>
+            <div className="auth-card modern-card">
+                <div className="auth-card-header center">
                     <h1 className="auth-title">Sign In</h1>
-                    <p className="auth-description">
-                        Sign in to manage your watchlist, alerts, and notifications.
-                    </p>
                 </div>
 
                 <form className="auth-form" onSubmit={handleSubmit}>
                     <div className="form-field">
-                        <label htmlFor="email">Email</label>
                         <input
                             id="email"
                             name="email"
                             type="email"
-                            placeholder="Enter your email"
+                            placeholder="Email"
                             value={form.email}
                             onChange={handleChange}
                             autoComplete="email"
@@ -88,14 +81,12 @@ function LoginPage() {
                     </div>
 
                     <div className="form-field">
-                        <label htmlFor="password">Password</label>
-
                         <div className="password-input-wrapper">
                             <input
                                 id="password"
                                 name="password"
                                 type={showPassword ? "text" : "password"}
-                                placeholder="Enter your password"
+                                placeholder="Password"
                                 value={form.password}
                                 onChange={handleChange}
                                 autoComplete="current-password"
@@ -106,18 +97,17 @@ function LoginPage() {
                                 type="button"
                                 className="password-toggle-button"
                                 onClick={() => setShowPassword((current) => !current)}
-                                aria-label={showPassword ? "Hide password" : "Show password"}
                             >
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
                     </div>
 
-                    {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
+                    {errorMessage && <p className="form-error">{errorMessage}</p>}
 
                     <button
                         type="submit"
-                        className="primary-button"
+                        className="primary-button large"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? "Signing in..." : "Sign In"}
@@ -125,11 +115,11 @@ function LoginPage() {
 
                     <div className="auth-footer-group">
                         <p className="auth-footer-text">
-                            <Link to="/forgot-password">Forgot your password?</Link>
+                            <Link to="/forgot-password">Forgot password?</Link>
                         </p>
 
                         <p className="auth-footer-text">
-                            Don&apos;t have an account? <Link to="/register">Create Account</Link>
+                            No account? <Link to="/register">Sign up</Link>
                         </p>
                     </div>
                 </form>

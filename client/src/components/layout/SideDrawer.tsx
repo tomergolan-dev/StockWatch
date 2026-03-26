@@ -1,3 +1,12 @@
+import {
+    X,
+    LayoutDashboard,
+    Bell,
+    ChartNoAxesCombined,
+    LogOut,
+    LogIn,
+    UserPlus,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -18,43 +27,56 @@ function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                 aria-hidden={!isOpen}
             />
 
-            <aside className={`side-drawer ${isOpen ? "open" : ""}`}>
+            <aside
+                className={`side-drawer ${isOpen ? "open" : ""}`}
+                aria-hidden={!isOpen}
+            >
                 <div className="side-drawer-header">
-                    <h2>Menu</h2>
+                    <h2 className="drawer-title">Menu</h2>
+
                     <button
                         type="button"
-                        className="icon-button"
+                        className="icon-button drawer-close-button"
                         onClick={onClose}
                         aria-label="Close navigation menu"
                     >
-                        ✕
+                        <X size={18} />
                     </button>
                 </div>
 
                 <nav className="side-drawer-nav">
                     <Link to="/" onClick={onClose}>
-                        Dashboard
+                        <LayoutDashboard size={18} />
+                        <span>Dashboard</span>
                     </Link>
 
                     {!isAuthenticated ? (
                         <>
                             <Link to="/login" onClick={onClose}>
-                                Login
+                                <LogIn size={18} />
+                                <span>Sign In</span>
                             </Link>
+
                             <Link to="/register" onClick={onClose}>
-                                Register
+                                <UserPlus size={18} />
+                                <span>Sign Up</span>
                             </Link>
                         </>
                     ) : (
                         <>
                             <Link to="/" onClick={onClose}>
-                                Watchlist
+                                <ChartNoAxesCombined size={18} />
+                                <span>Watchlist</span>
                             </Link>
+
                             <Link to="/" onClick={onClose}>
-                                Alerts
+                                <Bell size={18} />
+                                <span>Alerts</span>
                             </Link>
+
                             <Link to="/" onClick={onClose}>
-                                Notifications
+                                <Bell size={18} />
+                                <span>Notifications</span>
                             </Link>
 
                             <button
@@ -65,7 +87,8 @@ function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                                     onClose();
                                 }}
                             >
-                                Logout
+                                <LogOut size={18} />
+                                <span>Logout</span>
                             </button>
                         </>
                     )}
