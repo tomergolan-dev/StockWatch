@@ -64,17 +64,17 @@ function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                         </>
                     ) : (
                         <>
-                            <Link to="/" onClick={onClose}>
+                            <Link to="/watchlist" onClick={onClose}>
                                 <ChartNoAxesCombined size={18} />
                                 <span>Watchlist</span>
                             </Link>
 
-                            <Link to="/" onClick={onClose}>
+                            <Link to="/alerts" onClick={onClose}>
                                 <Bell size={18} />
                                 <span>Alerts</span>
                             </Link>
 
-                            <Link to="/" onClick={onClose}>
+                            <Link to="/notifications" onClick={onClose}>
                                 <Bell size={18} />
                                 <span>Notifications</span>
                             </Link>
