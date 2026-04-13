@@ -1,0 +1,444 @@
+/* =========================
+   CSS Reset
+========================= */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* =========================
+   Theme Variables
+========================= */
+:root {
+    color-scheme: light;
+
+    --bg-primary: #f4f7fb;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f8fbff;
+    --bg-elevated: rgba(255, 255, 255, 0.78);
+    --bg-soft: rgba(37, 99, 235, 0.08);
+    --bg-soft-strong: rgba(37, 99, 235, 0.14);
+    --bg-overlay: rgba(15, 23, 42, 0.22);
+
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --text-soft: #94a3b8;
+
+    --border-color: rgba(148, 163, 184, 0.24);
+    --border-strong: rgba(148, 163, 184, 0.34);
+
+    --accent-primary: #2563eb;
+    --accent-secondary: #1d9bf0;
+    --accent-hover: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.12);
+    --accent-soft-hover: rgba(37, 99, 235, 0.18);
+
+    --success: #16a34a;
+    --danger: #dc2626;
+
+    --shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.08);
+    --shadow-medium: 0 18px 45px rgba(15, 23, 42, 0.12);
+    --shadow-strong: 0 24px 70px rgba(15, 23, 42, 0.14);
+
+    --backdrop-blur: blur(18px);
+
+    --radius-sm: 14px;
+    --radius-md: 18px;
+    --radius-lg: 24px;
+    --radius-xl: 30px;
+
+    --transition-fast: 0.18s ease;
+    --transition-medium: 0.25s ease;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg-primary: #0b1220;
+    --bg-secondary: #111a2e;
+    --bg-tertiary: #162238;
+    --bg-elevated: rgba(17, 26, 46, 0.82);
+    --bg-soft: rgba(56, 189, 248, 0.1);
+    --bg-soft-strong: rgba(56, 189, 248, 0.16);
+    --bg-overlay: rgba(2, 6, 23, 0.5);
+
+    --text-primary: #edf4ff;
+    --text-secondary: #d5e2f2;
+    --text-muted: #9fb2c8;
+    --text-soft: #7f93ab;
+
+    --border-color: rgba(148, 163, 184, 0.18);
+    --border-strong: rgba(148, 163, 184, 0.28);
+
+    --accent-primary: #4ea1ff;
+    --accent-secondary: #38bdf8;
+    --accent-hover: #7bb8ff;
+    --accent-soft: rgba(78, 161, 255, 0.14);
+    --accent-soft-hover: rgba(78, 161, 255, 0.22);
+
+    --success: #22c55e;
+    --danger: #f87171;
+
+    --shadow-soft: 0 12px 34px rgba(0, 0, 0, 0.22);
+    --shadow-medium: 0 20px 54px rgba(0, 0, 0, 0.28);
+    --shadow-strong: 0 28px 80px rgba(0, 0, 0, 0.34);
+}
+
+/* =========================
+   Base
+========================= */
+html,
+body,
+#root {
+    min-height: 100%;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--text-primary);
+    background:
+            radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 24%),
+            radial-gradient(circle at top right, rgba(29, 155, 240, 0.1), transparent 20%),
+            linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-primary) 100%);
+    transition:
+            background-color var(--transition-medium),
+            color var(--transition-medium);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme="dark"] body {
+    background:
+            radial-gradient(circle at top left, rgba(78, 161, 255, 0.14), transparent 24%),
+            radial-gradient(circle at top right, rgba(56, 189, 248, 0.1), transparent 18%),
+            linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-primary) 100%);
+}
+
+img,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+button {
+    border: none;
+    background: none;
+}
+
+input,
+button,
+textarea,
+select {
+    outline: none;
+}
+
+/* =========================
+   Shared Layout Surface
+========================= */
+.app-shell {
+    min-height: 100vh;
+}
+
+.app-main {
+    width: min(1240px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 104px 0 36px;
+}
+
+.app-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.page-surface {
+    background: var(--bg-elevated);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 28px;
+}
+
+.page-title {
+    font-size: clamp(1.9rem, 3vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 10px;
+}
+
+.page-description {
+    max-width: 700px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    font-size: 1rem;
+}
+
+/* =========================
+   Generic Buttons
+========================= */
+.primary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 54px;
+    padding: 0 18px;
+
+    border-radius: 17px;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.2);
+
+    transition:
+            transform var(--transition-fast),
+            box-shadow var(--transition-fast),
+            opacity var(--transition-fast),
+            filter var(--transition-fast);
+}
+
+.primary-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 18px 32px rgba(37, 99, 235, 0.24);
+    filter: brightness(1.02);
+}
+
+.primary-button:active {
+    transform: translateY(0);
+}
+
+.primary-button:disabled {
+    opacity: 0.72;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.auth-secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 46px;
+    padding: 0 16px;
+    border-radius: 14px;
+
+    background: var(--accent-soft);
+    color: var(--accent-primary);
+    font-size: 0.96rem;
+    font-weight: 700;
+    text-decoration: none;
+
+    transition:
+            transform var(--transition-fast),
+            background-color var(--transition-fast),
+            color var(--transition-fast),
+            box-shadow var(--transition-fast);
+}
+
+.auth-secondary-button:hover {
+    transform: translateY(-1px);
+    background: var(--accent-primary);
+    color: #ffffff;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
+}
+
+.form-error,
+.form-success {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    text-align: center;
+}
+
+.form-error {
+    color: var(--danger);
+}
+
+.form-success {
+    color: var(--success);
+}
+
+/* =========================
+   Generic Modal
+========================= */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-box {
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+    border-radius: 20px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-box h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-subtext {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 0.94rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.86);
+    color: var(--text-primary);
+    transition:
+            border-color var(--transition-fast),
+            box-shadow var(--transition-fast),
+            background-color var(--transition-fast);
+}
+
+:root[data-theme="dark"] .form-group input,
+:root[data-theme="dark"] .form-group select {
+    background: rgba(13, 22, 39, 0.82);
+}
+
+.form-group input::placeholder {
+    color: var(--text-muted);
+}
+
+.form-group input:hover,
+.form-group select:hover {
+    border-color: var(--border-strong);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    background: var(--bg-secondary);
+}
+
+.modal-box .primary-button,
+.modal-box .auth-secondary-button,
+.modal-box .watchlist-remove-button {
+    width: auto;
+    min-width: 140px;
+}
+
+/* =========================
+   Legacy Navbar Support
+========================= */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 18px 0;
+}
+
+.navbar-left,
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* =========================
+   Shared Responsive
+========================= */
+@media (max-width: 992px) {
+    .app-main {
+        width: min(100%, calc(100% - 20px));
+    }
+}
+
+@media (max-width: 768px) {
+    .app-main {
+        padding-top: 92px;
+        padding-bottom: 24px;
+    }
+
+    .page-surface {
+        padding: 22px 18px;
+        border-radius: 22px;
+    }
+}
+
+@media (max-width: 640px) {
+    .modal-box {
+        max-width: calc(100% - 24px);
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .modal-box .primary-button,
+    .modal-box .auth-secondary-button,
+    .modal-box .watchlist-remove-button {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+}

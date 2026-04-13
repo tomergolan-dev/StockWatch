@@ -7,7 +7,7 @@ import type {
 
 /* Get the authenticated user's watchlist */
 export async function getWatchlist(): Promise<WatchlistResponse> {
-    const response = await axiosClient.get<WatchlistResponse>("/watchlist");
+    const response = await axiosClient.get<WatchlistResponse>("/api/watchlist");
     return response.data;
 }
 
@@ -16,7 +16,7 @@ export async function addToWatchlist(
     payload: AddToWatchlistPayload
 ): Promise<WatchlistMutationResponse> {
     const response = await axiosClient.post<WatchlistMutationResponse>(
-        "/watchlist",
+        "/api/watchlist",
         payload
     );
 
@@ -28,7 +28,7 @@ export async function removeFromWatchlist(
     symbol: string
 ): Promise<WatchlistMutationResponse> {
     const response = await axiosClient.delete<WatchlistMutationResponse>(
-        `/watchlist/${symbol}`
+        `/api/watchlist/${symbol}`
     );
 
     return response.data;

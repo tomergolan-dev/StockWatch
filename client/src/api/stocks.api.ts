@@ -6,7 +6,7 @@ import type {
 
 /* Search stocks by symbol or company name */
 export async function searchStocks(query: string): Promise<SearchStocksResponse> {
-    const response = await axiosClient.get<SearchStocksResponse>("/stocks/search", {
+    const response = await axiosClient.get<SearchStocksResponse>("/api/stocks/search", {
         params: {
             q: query,
         },
@@ -17,7 +17,7 @@ export async function searchStocks(query: string): Promise<SearchStocksResponse>
 
 /* Get detailed quote data for a specific stock symbol */
 export async function getStockQuote(symbol: string): Promise<StockQuoteResponse> {
-    const response = await axiosClient.get<StockQuoteResponse>(`/stocks/${symbol}`);
+    const response = await axiosClient.get<StockQuoteResponse>(`/api/stocks/${symbol}`);
 
     return response.data;
 }

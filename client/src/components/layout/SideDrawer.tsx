@@ -74,11 +74,6 @@ function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                                 <span>Alerts</span>
                             </Link>
 
-                            <Link to="/notifications" onClick={onClose}>
-                                <Bell size={18} />
-                                <span>Notifications</span>
-                            </Link>
-
                             <button
                                 type="button"
                                 className="drawer-logout-button"
