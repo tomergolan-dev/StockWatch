@@ -6,15 +6,14 @@ export type LoginPayload = {
     user: AuthUser;
 };
 
-export type AuthContextType = {
+export type AuthContextValue = {
     user: AuthUser | null;
     accessToken: string | null;
     isAuthenticated: boolean;
     login: (payload: LoginPayload) => void;
     logout: () => void;
     setUser: (user: AuthUser | null) => void;
+    updateUser: (user: AuthUser) => void;
 };
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-    undefined
-);
+export const AuthContext = createContext<AuthContextValue | null>(null);

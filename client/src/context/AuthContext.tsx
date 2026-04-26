@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { AuthContext, type LoginPayload } from "./auth-context";
 import type { AuthUser } from "../types/auth.types";
 
@@ -36,22 +36,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     );
 
     /* Save auth data after a successful login */
-    const login = ({ token, user }: LoginPayload) => {
+    const login = useCallback(({ token, user }: LoginPayload) => {
         setAccessToken(token);
         setUser(user);
 
         localStorage.setItem(ACCESS_TOKEN_KEY, token);
         localStorage.setItem(USER_KEY, JSON.stringify(user));
-    };
+    }, []);
+
+    /* Update authenticated user after profile changes */
+    const updateUser = useCallback((updatedUser: AuthUser) => {
+        setUser(updatedUser);
+        localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+    }, []);
 
     /* Clear auth data on logout */
-    const logout = () => {
+    const logout = useCallback(() => {
         setAccessToken(null);
         setUser(null);
 
         localStorage.removeItem(ACCESS_TOKEN_KEY);
         localStorage.removeItem(USER_KEY);
-    };
+    }, []);
 
     const value = useMemo(
         () => ({
@@ -61,8 +67,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             login,
             logout,
             setUser,
+            updateUser,
         }),
-        [user, accessToken]
+        [user, accessToken, login, logout, updateUser]
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

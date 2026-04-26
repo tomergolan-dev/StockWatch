@@ -1,47 +1,69 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getNotifications } from "../api/notifications.api";
 import { NotificationsContext } from "./NotificationsContext";
+import { useAuth } from "../hooks/useAuth";
 import type { NotificationItem } from "../types/notifications.types";
 
-/* Provide global notifications state */
+/* Provide global notifications state for authenticated users only */
 export function NotificationsProvider({
                                           children,
                                       }: {
     children: React.ReactNode;
 }) {
+    const { isAuthenticated } = useAuth();
+
     const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+    const isRefreshingRef = useRef(false);
 
-    /* Fetch notifications from the backend */
-    const refresh = async () => {
-        try {
-            const res = await getNotifications();
-            setNotifications(res.data);
-        } catch {
-            /* Silent fail for background refresh */
+    /* Fetch notifications safely */
+    const refresh = useCallback(async () => {
+        if (!isAuthenticated) {
+            setNotifications([]);
+            return;
         }
-    };
 
-    /* Poll notifications every 10 seconds */
+        if (isRefreshingRef.current) {
+            return;
+        }
+
+        isRefreshingRef.current = true;
+
+        try {
+            const response = await getNotifications();
+            setNotifications(response.data);
+        } catch {
+            setNotifications([]);
+        } finally {
+            isRefreshingRef.current = false;
+        }
+    }, [isAuthenticated]);
+
+    /* Poll notifications only when the user is authenticated */
     useEffect(() => {
+        if (!isAuthenticated) {
+            setNotifications([]);
+            return;
+        }
+
         void refresh();
 
         const intervalId = window.setInterval(() => {
             void refresh();
-        }, 10000);
+        }, 30000);
 
         return () => {
             window.clearInterval(intervalId);
         };
-    }, []);
+    }, [isAuthenticated, refresh]);
 
     /* Update one notification immediately in local state */
-    const updateLocal = (updated: NotificationItem) => {
+    const updateLocal = useCallback((updated: NotificationItem) => {
         setNotifications((current) =>
             current.map((notification) =>
                 notification._id === updated._id ? updated : notification
             )
         );
-    };
+    }, []);
 
     const unreadCount = useMemo(
         () => notifications.filter((notification) => !notification.isRead).length,
@@ -55,7 +77,7 @@ export function NotificationsProvider({
             refresh,
             updateLocal,
         }),
-        [notifications, unreadCount]
+        [notifications, unreadCount, refresh, updateLocal]
     );
 
     return (
