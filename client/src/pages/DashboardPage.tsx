@@ -6,7 +6,7 @@ import StockSearchResults from "../features/dashboard/StockSearchResults";
 import PopularStocks from "../features/stocks/PopularStocks";
 import type { StockSearchItem } from "../types/stocks.types";
 
-/* Display the main dashboard with stock search and market overview */
+/* Display the main dashboard with market overview and stock search */
 function DashboardPage() {
     const [query, setQuery] = useState("");
     const [stocks, setStocks] = useState<StockSearchItem[]>([]);
@@ -14,7 +14,6 @@ function DashboardPage() {
     const [hasSearched, setHasSearched] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
-    /* Search stocks by symbol or company name */
     const handleSearch = async () => {
         const trimmedQuery = query.trim();
 
@@ -30,7 +29,6 @@ function DashboardPage() {
 
         try {
             const response = await searchStocks(trimmedQuery);
-
             setStocks(response.data);
             setHasSearched(true);
         } catch (error: unknown) {
@@ -53,24 +51,23 @@ function DashboardPage() {
     };
 
     return (
-        <section className="page-surface dashboard-search-page">
-            <div className="dashboard-search-hero">
-                <div className="dashboard-search-copy">
-                    <p className="dashboard-search-eyebrow">Stock Discovery</p>
-                    <h1 className="page-title">Search stocks in seconds</h1>
-                    <p className="page-description">
-                        Explore symbols, check matching companies, and quickly add favorites to
-                        your watchlist when signed in.
-                    </p>
-                </div>
-            </div>
+        <section className="dashboard-showcase-page">
+            <header className="dashboard-showcase-hero">
+                <p className="dashboard-eyebrow">Market Watch</p>
+                <h1 className="dashboard-showcase-title">Popular Stocks</h1>
+                <p className="dashboard-showcase-description">
+                    Daily market overview. Search a stock or click a card to view details.
+                </p>
+            </header>
 
-            <StockSearchBar
-                query={query}
-                isLoading={isLoading}
-                onQueryChange={setQuery}
-                onSearch={handleSearch}
-            />
+            <div className="dashboard-control-panel single-search">
+                <StockSearchBar
+                    query={query}
+                    isLoading={isLoading}
+                    onQueryChange={setQuery}
+                    onSearch={handleSearch}
+                />
+            </div>
 
             {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
 

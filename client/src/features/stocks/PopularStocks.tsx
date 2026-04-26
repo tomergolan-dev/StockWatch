@@ -17,9 +17,24 @@ type PopularStock = {
     previousClose: number;
 };
 
-const popularSymbols = ["AAPL", "NVDA", "MSFT", "TSLA", "AMZN", "GOOGL"];
+type StockBrand = {
+    name: string;
+    logoText: string;
+    logoClass: string;
+};
 
-/* Display popular stocks on the dashboard */
+const popularSymbols = ["AAPL", "MSFT", "NVDA", "GOOGL", "TSLA", "AMZN"];
+
+const stockBrands: Record<string, StockBrand> = {
+    AAPL: { name: "Apple Inc.", logoText: "A", logoClass: "apple" },
+    MSFT: { name: "Microsoft Corp.", logoText: "M", logoClass: "microsoft" },
+    NVDA: { name: "NVIDIA Corp.", logoText: "N", logoClass: "nvidia" },
+    GOOGL: { name: "Alphabet Inc.", logoText: "G", logoClass: "google" },
+    TSLA: { name: "Tesla Inc.", logoText: "T", logoClass: "tesla" },
+    AMZN: { name: "Amazon.com Inc.", logoText: "A", logoClass: "amazon" },
+};
+
+/* Display popular market stocks */
 function PopularStocks() {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
@@ -94,104 +109,114 @@ function PopularStocks() {
         void loadPopularStocks();
     }, []);
 
+    if (isLoading) {
+        return (
+            <section className="popular-stocks-grid">
+                {popularSymbols.map((symbol) => (
+                    <article key={symbol} className="popular-stock-card skeleton" />
+                ))}
+            </section>
+        );
+    }
+
+    if (errorMessage) {
+        return <p className="form-error">{errorMessage}</p>;
+    }
+
     return (
         <section className="popular-stocks-section">
-            <div className="popular-stocks-header">
-                <div>
-                    <p className="dashboard-search-eyebrow">Market Watch</p>
-                    <h2 className="popular-stocks-title">Popular Stocks</h2>
-                    <p className="popular-stocks-description">
-                        Daily market overview. Click a stock card to view details and charts.
-                    </p>
-                </div>
-            </div>
-
-            {isLoading ? (
-                <div className="popular-stocks-grid">
-                    {popularSymbols.map((symbol) => (
-                        <div className="popular-stock-card skeleton" key={symbol} />
-                    ))}
-                </div>
-            ) : null}
-
-            {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
-
             {actionMessage ? (
                 <p className="form-success popular-stocks-message">
                     {actionMessage}
                 </p>
             ) : null}
 
-            {!isLoading && !errorMessage ? (
-                <div className="popular-stocks-grid">
-                    {stocks.map((stock) => {
-                        const isPositive = stock.change >= 0;
+            <div className="popular-stocks-grid">
+                {stocks.map((stock) => {
+                    const brand = stockBrands[stock.symbol];
+                    const isPositive = stock.change >= 0;
 
-                        return (
-                            <article
-                                className="popular-stock-card clickable-stock-card"
-                                key={stock.symbol}
-                                onClick={() => navigate(`/stock/${stock.symbol}`)}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(event) => {
-                                    if (event.key === "Enter") {
-                                        navigate(`/stock/${stock.symbol}`);
-                                    }
-                                }}
-                            >
-                                <div className="popular-stock-top">
-                                    <div>
-                                        <h3>{stock.symbol}</h3>
-                                        <p>Popular market symbol</p>
+                    return (
+                        <article
+                            key={stock.symbol}
+                            className="popular-stock-card"
+                            onClick={() => navigate(`/stock/${stock.symbol}`)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                    navigate(`/stock/${stock.symbol}`);
+                                }
+                            }}
+                        >
+                            <div className="popular-stock-header-row">
+                                <div className="popular-stock-company">
+                                    <div className={`popular-stock-logo ${brand.logoClass}`}>
+                                        {brand.logoText}
                                     </div>
 
-                                    <span
-                                        className={`popular-stock-change ${
-                                            isPositive ? "positive" : "negative"
-                                        }`}
-                                    >
-                                        {isPositive ? "+" : ""}
-                                        {stock.percentChange.toFixed(2)}%
-                                    </span>
+                                    <div>
+                                        <h3>{stock.symbol}</h3>
+                                        <p>{brand.name}</p>
+                                    </div>
                                 </div>
 
-                                <div className="popular-stock-price-row">
-                                    <span className="popular-stock-price">
-                                        ${stock.currentPrice.toFixed(2)}
-                                    </span>
-
-                                    <span
-                                        className={`popular-stock-delta ${
-                                            isPositive ? "positive" : "negative"
-                                        }`}
-                                    >
-                                        {isPositive ? "+" : ""}
-                                        {stock.change.toFixed(2)}
-                                    </span>
-                                </div>
-
-                                <div className="popular-stock-meta">
-                                    <span>Open ${stock.open.toFixed(2)}</span>
-                                    <span>High ${stock.high.toFixed(2)}</span>
-                                    <span>Low ${stock.low.toFixed(2)}</span>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    className="popular-stock-button"
-                                    onClick={(event) =>
-                                        handleAddToWatchlist(event, stock.symbol)
-                                    }
+                                <span
+                                    className={`popular-stock-percent ${
+                                        isPositive ? "positive" : "negative"
+                                    }`}
                                 >
-                                    <Plus size={16} />
-                                    <span>Add to Watchlist</span>
-                                </button>
-                            </article>
-                        );
-                    })}
-                </div>
-            ) : null}
+                                    {isPositive ? "+" : ""}
+                                    {stock.percentChange.toFixed(2)}%
+                                </span>
+                            </div>
+
+                            <div className="popular-stock-price-row">
+                                <strong>${stock.currentPrice.toFixed(2)}</strong>
+
+                                <span
+                                    className={`popular-stock-delta ${
+                                        isPositive ? "positive" : "negative"
+                                    }`}
+                                >
+                                    {isPositive ? "+" : ""}
+                                    {stock.change.toFixed(2)}
+                                </span>
+                            </div>
+
+                            <div className="popular-stock-divider" />
+
+                            <div className="popular-stock-meta">
+                                <div>
+                                    <span>Open</span>
+                                    <strong>${stock.open.toFixed(2)}</strong>
+                                </div>
+
+                                <div>
+                                    <span>High</span>
+                                    <strong>${stock.high.toFixed(2)}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Low</span>
+                                    <strong>${stock.low.toFixed(2)}</strong>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                className="popular-stock-button"
+                                onClick={(event) =>
+                                    handleAddToWatchlist(event, stock.symbol)
+                                }
+                            >
+                                <Plus size={16} />
+                                <span>Add to Watchlist</span>
+                            </button>
+                        </article>
+                    );
+                })}
+            </div>
         </section>
     );
 }

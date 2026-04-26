@@ -7,7 +7,7 @@ type StockSearchResultsProps = {
     isLoading: boolean;
 };
 
-/* Render the stock search results area */
+/* Render stock search results */
 function StockSearchResults({
                                 stocks,
                                 hasSearched,
@@ -15,41 +15,40 @@ function StockSearchResults({
                             }: StockSearchResultsProps) {
     if (isLoading) {
         return (
-            <div className="stock-results-state">
+            <section className="stock-results-state">
                 <p className="page-description">Searching stocks...</p>
-            </div>
+            </section>
         );
     }
 
     if (!hasSearched) {
-        return (
-            <div className="stock-results-state">
-                <p className="page-description">
-                    Search for a stock symbol or company name to get started.
-                </p>
-            </div>
-        );
+        return null;
     }
 
     if (stocks.length === 0) {
         return (
-            <div className="stock-results-state">
-                <p className="page-description">
-                    No matching stocks were found.
-                </p>
-            </div>
+            <section className="stock-results-state">
+                <p className="page-description">No matching stocks were found.</p>
+            </section>
         );
     }
 
     return (
-        <div className="stock-results-list">
-            {stocks.map((stock) => (
-                <StockSearchResultCard
-                    key={`${stock.symbol}-${stock.description}`}
-                    stock={stock}
-                />
-            ))}
-        </div>
+        <section className="stock-results-section">
+            <div className="stock-results-header">
+                <h2>Search results</h2>
+                <p>Click a result to open stock details.</p>
+            </div>
+
+            <div className="stock-results-list">
+                {stocks.map((stock) => (
+                    <StockSearchResultCard
+                        key={`${stock.symbol}-${stock.description}`}
+                        stock={stock}
+                    />
+                ))}
+            </div>
+        </section>
     );
 }
 

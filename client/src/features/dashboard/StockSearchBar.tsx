@@ -1,3 +1,4 @@
+import { Search } from "lucide-react";
 import type { ChangeEvent, FormEvent } from "react";
 
 type StockSearchBarProps = {
@@ -7,7 +8,7 @@ type StockSearchBarProps = {
     onSearch: () => void;
 };
 
-/* Render the stock search input and search button */
+/* Render the stock search input */
 function StockSearchBar({
                             query,
                             isLoading,
@@ -25,17 +26,22 @@ function StockSearchBar({
 
     return (
         <form className="stock-search-bar" onSubmit={handleSubmit}>
-            <input
-                type="text"
-                value={query}
-                onChange={handleChange}
-                placeholder="Search stocks (e.g. Apple, TSLA, AAPL)"
-                className="stock-search-input"
-            />
+            <div className="stock-search-input-shell">
+                <Search size={22} />
+
+                <input
+                    type="text"
+                    value={query}
+                    onChange={handleChange}
+                    placeholder="Search stocks..."
+                    className="stock-search-input"
+                    disabled={isLoading}
+                />
+            </div>
 
             <button
                 type="submit"
-                className="primary-button stock-search-button"
+                className="stock-search-submit"
                 disabled={isLoading}
             >
                 {isLoading ? "Searching..." : "Search"}
