@@ -1,5 +1,7 @@
 import { AxiosError } from "axios";
 import { useState } from "react";
+import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import { createAlert } from "../../api/alerts.api";
 import type { CreateAlertPayload } from "../../types/alerts.types";
 
@@ -55,7 +57,7 @@ function CreateAlertModal({ symbol, onClose }: CreateAlertModalProps) {
         }
     };
 
-    return (
+    return createPortal(
         <div className="modal-overlay">
             <div className="modal-box">
                 {!success ? (
@@ -70,9 +72,10 @@ function CreateAlertModal({ symbol, onClose }: CreateAlertModalProps) {
                             <label>Metric</label>
                             <select
                                 value={metric}
-                                onChange={(e) =>
-                                    setMetric(e.target.value as "price" | "percent")
+                                onChange={(event) =>
+                                    setMetric(event.target.value as "price" | "percent")
                                 }
+                                disabled={isSubmitting}
                             >
                                 <option value="price">Price</option>
                                 <option value="percent">Percent</option>
@@ -83,9 +86,10 @@ function CreateAlertModal({ symbol, onClose }: CreateAlertModalProps) {
                             <label>Direction</label>
                             <select
                                 value={direction}
-                                onChange={(e) =>
-                                    setDirection(e.target.value as "up" | "down")
+                                onChange={(event) =>
+                                    setDirection(event.target.value as "up" | "down")
                                 }
+                                disabled={isSubmitting}
                             >
                                 <option value="up">Up</option>
                                 <option value="down">Down</option>
@@ -97,17 +101,17 @@ function CreateAlertModal({ symbol, onClose }: CreateAlertModalProps) {
                             <input
                                 type="number"
                                 value={value}
-                                onChange={(e) => setValue(e.target.value)}
+                                onChange={(event) => setValue(event.target.value)}
                                 placeholder="Enter value"
+                                disabled={isSubmitting}
                             />
                         </div>
 
-                        {errorMessage && (
-                            <p className="form-error">{errorMessage}</p>
-                        )}
+                        {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
 
                         <div className="modal-actions">
                             <button
+                                type="button"
                                 className="auth-secondary-button"
                                 onClick={onClose}
                                 disabled={isSubmitting}
@@ -116,6 +120,7 @@ function CreateAlertModal({ symbol, onClose }: CreateAlertModalProps) {
                             </button>
 
                             <button
+                                type="button"
                                 className="primary-button"
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
@@ -134,20 +139,22 @@ function CreateAlertModal({ symbol, onClose }: CreateAlertModalProps) {
 
                         <div className="modal-actions">
                             <button
+                                type="button"
                                 className="auth-secondary-button"
                                 onClick={onClose}
                             >
                                 Close
                             </button>
 
-                            <a href="/alerts" className="primary-button">
+                            <Link to="/alerts" className="primary-button">
                                 Go to Alerts
-                            </a>
+                            </Link>
                         </div>
                     </>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 

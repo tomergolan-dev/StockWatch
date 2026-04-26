@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import {
     ArrowDown,
     ArrowUp,
@@ -37,6 +38,7 @@ function AlertItemCard({ alert, onDeleted }: AlertItemCardProps) {
         try {
             await deleteAlert(alert._id);
             onDeleted(alert._id);
+            setShowConfirm(false);
         } catch (error: unknown) {
             let serverMessage = "Failed to delete alert.";
 
@@ -51,7 +53,6 @@ function AlertItemCard({ alert, onDeleted }: AlertItemCardProps) {
             setErrorMessage(serverMessage);
         } finally {
             setIsDeleting(false);
-            setShowConfirm(false);
         }
     };
 
@@ -147,37 +148,41 @@ function AlertItemCard({ alert, onDeleted }: AlertItemCardProps) {
                 </div>
             </article>
 
-            {showConfirm && isActive ? (
-                <div className="modal-overlay">
-                    <div className="modal-box">
-                        <h3>Delete alert?</h3>
-                        <p>
-                            Are you sure you want to delete the alert for{" "}
-                            <strong>{alert.symbol}</strong>?
-                        </p>
+            {showConfirm && isActive
+                ? createPortal(
+                    <div className="modal-overlay">
+                        <div className="modal-box">
+                            <h3>Delete alert?</h3>
 
-                        <div className="modal-actions">
-                            <button
-                                type="button"
-                                className="auth-secondary-button"
-                                onClick={() => setShowConfirm(false)}
-                                disabled={isDeleting}
-                            >
-                                Cancel
-                            </button>
+                            <p>
+                                Are you sure you want to delete the alert for{" "}
+                                <strong>{alert.symbol}</strong>?
+                            </p>
 
-                            <button
-                                type="button"
-                                className="alert-delete-button modal-delete-button"
-                                onClick={handleDelete}
-                                disabled={isDeleting}
-                            >
-                                {isDeleting ? "Deleting..." : "Yes, Delete"}
-                            </button>
+                            <div className="modal-actions">
+                                <button
+                                    type="button"
+                                    className="auth-secondary-button"
+                                    onClick={() => setShowConfirm(false)}
+                                    disabled={isDeleting}
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="alert-delete-button modal-delete-button"
+                                    onClick={handleDelete}
+                                    disabled={isDeleting}
+                                >
+                                    {isDeleting ? "Deleting..." : "Yes, Delete"}
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            ) : null}
+                    </div>,
+                    document.body
+                )
+                : null}
         </>
     );
 }

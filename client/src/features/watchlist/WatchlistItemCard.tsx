@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { BellPlus, Trash2 } from "lucide-react";
 import { removeFromWatchlist } from "../../api/watchlist.api";
 import type { WatchlistItem } from "../../types/watchlist.types";
@@ -26,6 +27,7 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
         try {
             await removeFromWatchlist(item.symbol);
             onRemoved(item.symbol);
+            setShowConfirm(false);
         } catch (error: unknown) {
             let serverMessage = "Failed to remove stock from watchlist.";
 
@@ -40,7 +42,6 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
             setErrorMessage(serverMessage);
         } finally {
             setIsRemoving(false);
-            setShowConfirm(false);
         }
     };
 
@@ -109,42 +110,48 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
                 </div>
             </article>
 
-            {showConfirm && (
-                <div className="modal-overlay">
-                    <div className="modal-box">
-                        <h3>Remove stock?</h3>
-                        <p>
-                            Are you sure you want to remove{" "}
-                            <strong>{item.symbol}</strong> from your watchlist?
-                        </p>
+            {showConfirm
+                ? createPortal(
+                    <div className="modal-overlay">
+                        <div className="modal-box">
+                            <h3>Remove stock?</h3>
 
-                        <div className="modal-actions">
-                            <button
-                                className="auth-secondary-button"
-                                onClick={() => setShowConfirm(false)}
-                                disabled={isRemoving}
-                            >
-                                Cancel
-                            </button>
+                            <p>
+                                Are you sure you want to remove{" "}
+                                <strong>{item.symbol}</strong> from your watchlist?
+                            </p>
 
-                            <button
-                                className="watchlist-remove-button"
-                                onClick={handleRemove}
-                                disabled={isRemoving}
-                            >
-                                {isRemoving ? "Removing..." : "Yes, Remove"}
-                            </button>
+                            <div className="modal-actions">
+                                <button
+                                    type="button"
+                                    className="auth-secondary-button"
+                                    onClick={() => setShowConfirm(false)}
+                                    disabled={isRemoving}
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="watchlist-remove-button"
+                                    onClick={handleRemove}
+                                    disabled={isRemoving}
+                                >
+                                    {isRemoving ? "Removing..." : "Yes, Remove"}
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            )}
+                    </div>,
+                    document.body
+                )
+                : null}
 
-            {showAlertModal && (
+            {showAlertModal ? (
                 <CreateAlertModal
                     symbol={item.symbol}
                     onClose={() => setShowAlertModal(false)}
                 />
-            )}
+            ) : null}
         </>
     );
 }

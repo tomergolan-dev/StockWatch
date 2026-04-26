@@ -289,42 +289,100 @@ select {
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.5);
+    z-index: 3000;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 999;
+
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(6px);
+
+    overflow-y: auto;
 }
 
 .modal-box {
-    width: 100%;
-    max-width: 420px;
+    width: min(100%, 460px);
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+
+    margin: auto;
     padding: 24px;
-    border-radius: 20px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    border-radius: 22px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+}
+
+:root[data-theme="dark"] .modal-box {
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
 }
 
 .modal-box h3 {
     font-size: 1.2rem;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.modal-subtext,
+.modal-box p {
+    color: var(--text-muted);
+    line-height: 1.6;
 }
 
 .modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    margin-top: 4px;
 }
 
-.modal-subtext {
-    color: var(--text-muted);
-    line-height: 1.6;
+.modal-box .primary-button,
+.modal-box .auth-secondary-button,
+.modal-box .watchlist-remove-button,
+.modal-box .alert-delete-button {
+    width: auto;
+    min-width: 140px;
 }
 
+@media (max-width: 640px) {
+    .modal-overlay {
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .modal-box {
+        width: 100%;
+        max-height: calc(100dvh - 32px);
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .modal-box .primary-button,
+    .modal-box .auth-secondary-button,
+    .modal-box .watchlist-remove-button,
+    .modal-box .alert-delete-button {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+/* =========================
+   Shared Forms
+========================= */
 .form-group {
     display: flex;
     flex-direction: column;
@@ -373,13 +431,6 @@ select {
     background: var(--bg-secondary);
 }
 
-.modal-box .primary-button,
-.modal-box .auth-secondary-button,
-.modal-box .watchlist-remove-button {
-    width: auto;
-    min-width: 140px;
-}
-
 /* =========================
    Legacy Navbar Support
 ========================= */
@@ -420,24 +471,6 @@ select {
 }
 
 @media (max-width: 640px) {
-    .modal-box {
-        max-width: calc(100% - 24px);
-        padding: 20px;
-        border-radius: 18px;
-    }
-
-    .modal-actions {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .modal-box .primary-button,
-    .modal-box .auth-secondary-button,
-    .modal-box .watchlist-remove-button {
-        width: 100%;
-        min-width: 0;
-    }
-
     .page-title {
         font-size: 2rem;
     }
