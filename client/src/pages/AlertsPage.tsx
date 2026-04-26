@@ -42,8 +42,8 @@ function AlertsPage() {
     };
 
     const handleDeleted = (id: string) => {
-        setAlerts((current) =>
-            current.filter((alert) => alert._id !== id)
+        setAlerts((currentAlerts) =>
+            currentAlerts.filter((alert) => alert._id !== id)
         );
     };
 
@@ -51,14 +51,12 @@ function AlertsPage() {
         void loadAlerts();
     }, []);
 
-    /* Active alerts always on top */
     const sortedAlerts = useMemo(() => {
         return [...alerts].sort(
             (a, b) => Number(b.isActive) - Number(a.isActive)
         );
     }, [alerts]);
 
-    /* Multi-filter logic */
     const filteredAlerts = useMemo(() => {
         return sortedAlerts.filter((alert) => {
             const matchesStatus =
@@ -67,8 +65,7 @@ function AlertsPage() {
                 (statusFilter === "triggered" && !alert.isActive);
 
             const matchesMetric =
-                metricFilter === "all" ||
-                alert.metric === metricFilter;
+                metricFilter === "all" || alert.metric === metricFilter;
 
             return matchesStatus && matchesMetric;
         });
@@ -81,18 +78,18 @@ function AlertsPage() {
                     <p className="dashboard-search-eyebrow">Your Alerts</p>
                     <h1 className="page-title">Alerts</h1>
                     <p className="page-description">
-                        Manage your alerts, filter them by status and type, and track
-                        what matters most.
+                        Manage active and triggered alerts, filter by status and type,
+                        and keep track of price or percent movements.
                     </p>
                 </div>
             </div>
 
             <div className="alerts-toolbar">
-                {/* STATUS FILTER */}
                 <div className="alerts-filter-group">
                     <span className="alerts-filter-label">Status:</span>
 
                     <button
+                        type="button"
                         className={`alerts-filter-button ${
                             statusFilter === "all" ? "active" : ""
                         }`}
@@ -102,6 +99,7 @@ function AlertsPage() {
                     </button>
 
                     <button
+                        type="button"
                         className={`alerts-filter-button ${
                             statusFilter === "active" ? "active" : ""
                         }`}
@@ -111,6 +109,7 @@ function AlertsPage() {
                     </button>
 
                     <button
+                        type="button"
                         className={`alerts-filter-button ${
                             statusFilter === "triggered" ? "active" : ""
                         }`}
@@ -120,11 +119,11 @@ function AlertsPage() {
                     </button>
                 </div>
 
-                {/* METRIC FILTER */}
                 <div className="alerts-filter-group">
                     <span className="alerts-filter-label">Type:</span>
 
                     <button
+                        type="button"
                         className={`alerts-filter-button ${
                             metricFilter === "all" ? "active" : ""
                         }`}
@@ -134,6 +133,7 @@ function AlertsPage() {
                     </button>
 
                     <button
+                        type="button"
                         className={`alerts-filter-button ${
                             metricFilter === "price" ? "active" : ""
                         }`}
@@ -143,6 +143,7 @@ function AlertsPage() {
                     </button>
 
                     <button
+                        type="button"
                         className={`alerts-filter-button ${
                             metricFilter === "percent" ? "active" : ""
                         }`}
@@ -153,7 +154,7 @@ function AlertsPage() {
                 </div>
             </div>
 
-            {errorMessage && <p className="form-error">{errorMessage}</p>}
+            {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
 
             <AlertsList
                 alerts={filteredAlerts}

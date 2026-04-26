@@ -12,6 +12,7 @@ import RegisterPage from "../pages/RegisterPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import VerifyEmailPage from "../pages/VerifyEmailPage";
 import WatchlistPage from "../pages/WatchlistPage";
+import StockPage from "../pages/StockPage";
 
 /* Define the main application routes with a shared layout */
 export const router = createBrowserRouter([
@@ -23,6 +24,12 @@ export const router = createBrowserRouter([
                 index: true,
                 element: <DashboardPage />,
             },
+
+            {
+                path: "stock/:symbol",
+                element: <StockPage />,
+            },
+
             {
                 path: "login",
                 element: (

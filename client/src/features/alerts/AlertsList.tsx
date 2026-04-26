@@ -7,7 +7,7 @@ type AlertsListProps = {
     onDeleted: (id: string) => void;
 };
 
-/* Render the alerts list with loading and empty states */
+/* Render alerts with loading and empty states */
 function AlertsList({ alerts, isLoading, onDeleted }: AlertsListProps) {
     if (isLoading) {
         return (
@@ -21,7 +21,7 @@ function AlertsList({ alerts, isLoading, onDeleted }: AlertsListProps) {
         return (
             <div className="alerts-state">
                 <p className="page-description">
-                    No alerts match the current filter.
+                    No alerts match the current filters.
                 </p>
             </div>
         );

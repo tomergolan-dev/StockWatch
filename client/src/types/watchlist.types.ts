@@ -5,6 +5,10 @@ export type WatchlistItem = {
     currentPrice: number;
     change: number;
     percentChange: number;
+    open: number;
+    high: number;
+    low: number;
+    previousClose?: number;
 };
 
 /* Represent the watchlist response */

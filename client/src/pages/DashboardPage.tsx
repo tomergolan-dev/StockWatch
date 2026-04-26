@@ -3,9 +3,10 @@ import { useState } from "react";
 import { searchStocks } from "../api/stocks.api";
 import StockSearchBar from "../features/dashboard/StockSearchBar";
 import StockSearchResults from "../features/dashboard/StockSearchResults";
+import PopularStocks from "../features/stocks/PopularStocks";
 import type { StockSearchItem } from "../types/stocks.types";
 
-/* Display the main dashboard with stock search */
+/* Display the main dashboard with stock search and market overview */
 function DashboardPage() {
     const [query, setQuery] = useState("");
     const [stocks, setStocks] = useState<StockSearchItem[]>([]);
@@ -78,6 +79,8 @@ function DashboardPage() {
                 hasSearched={hasSearched}
                 isLoading={isLoading}
             />
+
+            <PopularStocks />
         </section>
     );
 }

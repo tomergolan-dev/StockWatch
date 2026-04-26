@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import { useState } from "react";
+import { BellPlus, Trash2 } from "lucide-react";
 import { removeFromWatchlist } from "../../api/watchlist.api";
 import type { WatchlistItem } from "../../types/watchlist.types";
 import CreateAlertModal from "./CreateAlertModal";
@@ -9,7 +10,7 @@ type WatchlistItemCardProps = {
     onRemoved: (symbol: string) => void;
 };
 
-/* Display a single watchlist stock card with actions */
+/* Display a single watchlist stock card with market data and actions */
 function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
     const [isRemoving, setIsRemoving] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -18,7 +19,6 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
 
     const isPositive = item.change >= 0;
 
-    /* Remove the stock from the authenticated user's watchlist */
     const handleRemove = async () => {
         setIsRemoving(true);
         setErrorMessage("");
@@ -46,59 +46,76 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
 
     return (
         <>
-            <article className="watchlist-card">
-                <div className="watchlist-card-main">
-                    <div className="watchlist-card-top">
-                        <div>
-                            <h3 className="watchlist-symbol">{item.symbol}</h3>
-                            <p className="watchlist-company-name">{item.companyName}</p>
-                        </div>
-
-                        <div className="watchlist-price-block">
-                            <p className="watchlist-price">${item.currentPrice.toFixed(2)}</p>
-                            <p
-                                className={`watchlist-change ${
-                                    isPositive ? "positive" : "negative"
-                                }`}
-                            >
-                                {isPositive ? "+" : ""}
-                                {item.change.toFixed(2)} ({isPositive ? "+" : ""}
-                                {item.percentChange.toFixed(2)}%)
-                            </p>
-                        </div>
+            <article className="watchlist-card market-stock-card">
+                <div className="market-stock-top">
+                    <div>
+                        <h3 className="market-stock-symbol">{item.symbol}</h3>
+                        <p className="market-stock-company">{item.companyName}</p>
                     </div>
 
-                    {errorMessage ? (
-                        <p className="form-error watchlist-message">{errorMessage}</p>
-                    ) : null}
+                    <span
+                        className={`market-stock-change-badge ${
+                            isPositive ? "positive" : "negative"
+                        }`}
+                    >
+                        {isPositive ? "+" : ""}
+                        {item.percentChange.toFixed(2)}%
+                    </span>
                 </div>
 
-                <div className="watchlist-card-actions">
+                <div className="market-stock-price-row">
+                    <span className="market-stock-price">
+                        ${item.currentPrice.toFixed(2)}
+                    </span>
+
+                    <span
+                        className={`market-stock-delta ${
+                            isPositive ? "positive" : "negative"
+                        }`}
+                    >
+                        {isPositive ? "+" : ""}
+                        {item.change.toFixed(2)}
+                    </span>
+                </div>
+
+                <div className="market-stock-meta">
+                    <span>Open ${item.open.toFixed(2)}</span>
+                    <span>High ${item.high.toFixed(2)}</span>
+                    <span>Low ${item.low.toFixed(2)}</span>
+                </div>
+
+                {errorMessage ? (
+                    <p className="form-error watchlist-message">{errorMessage}</p>
+                ) : null}
+
+                <div className="market-stock-actions">
                     <button
                         type="button"
-                        className="watchlist-action-link"
+                        className="market-stock-action-button"
                         onClick={() => setShowAlertModal(true)}
                     >
-                        Create Alert
+                        <BellPlus size={16} />
+                        <span>Create Alert</span>
                     </button>
 
                     <button
                         type="button"
-                        className="watchlist-remove-button"
+                        className="market-stock-remove-button"
                         onClick={() => setShowConfirm(true)}
                     >
-                        Remove
+                        <Trash2 size={16} />
+                        <span>Remove</span>
                     </button>
                 </div>
             </article>
 
-            {/* Confirm delete modal */}
             {showConfirm && (
                 <div className="modal-overlay">
                     <div className="modal-box">
                         <h3>Remove stock?</h3>
                         <p>
-                            Are you sure you want to remove <strong>{item.symbol}</strong> from your watchlist?
+                            Are you sure you want to remove{" "}
+                            <strong>{item.symbol}</strong> from your watchlist?
                         </p>
 
                         <div className="modal-actions">
@@ -122,7 +139,6 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
                 </div>
             )}
 
-            {/* Create alert modal */}
             {showAlertModal && (
                 <CreateAlertModal
                     symbol={item.symbol}

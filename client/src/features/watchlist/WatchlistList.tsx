@@ -25,7 +25,8 @@ function WatchlistList({
         return (
             <div className="watchlist-state">
                 <p className="page-description">
-                    Your watchlist is empty. Search for stocks on the dashboard and add your favorites.
+                    Your watchlist is empty. Search for stocks on the dashboard and add
+                    your favorites.
                 </p>
             </div>
         );

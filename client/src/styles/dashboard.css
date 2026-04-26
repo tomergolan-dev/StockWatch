@@ -308,3 +308,277 @@
         font-size: 0.8rem;
     }
 }
+
+/* =========================
+   Popular Stocks
+========================= */
+.popular-stocks-section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.popular-stocks-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.popular-stocks-title {
+    font-size: 1.45rem;
+    font-weight: 850;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+}
+
+.popular-stocks-description {
+    margin-top: 6px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.popular-stocks-message {
+    text-align: left;
+}
+
+.popular-stocks-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.popular-stock-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    min-height: 230px;
+    padding: 20px;
+    border-radius: 22px;
+    border: 1px solid var(--border-color);
+
+    background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.94));
+
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+
+    transition:
+            border-color var(--transition-fast),
+            box-shadow var(--transition-fast),
+            background var(--transition-fast);
+}
+
+:root[data-theme="dark"] .popular-stock-card {
+    background:
+            linear-gradient(180deg, rgba(22, 34, 56, 0.78), rgba(17, 26, 46, 0.94));
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+}
+
+.popular-stock-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.12);
+}
+
+.popular-stock-card.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-soft);
+}
+
+.popular-stock-card.skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+            linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.35),
+                    transparent
+            );
+    animation: skeleton-slide 1.2s infinite;
+}
+
+@keyframes skeleton-slide {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.popular-stock-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.popular-stock-top h3 {
+    font-size: 1.2rem;
+    font-weight: 850;
+    color: var(--text-primary);
+}
+
+.popular-stock-top p {
+    margin-top: 4px;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.popular-stock-change {
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.popular-stock-change.positive {
+    background: rgba(22, 163, 74, 0.12);
+    color: var(--success);
+}
+
+.popular-stock-change.negative {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--danger);
+}
+
+.popular-stock-price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.popular-stock-price {
+    font-size: 1.65rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+}
+
+.popular-stock-delta {
+    font-size: 0.96rem;
+    font-weight: 800;
+}
+
+.popular-stock-delta.positive {
+    color: var(--success);
+}
+
+.popular-stock-delta.negative {
+    color: var(--danger);
+}
+
+.popular-stock-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.popular-stock-meta span {
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+
+    display: inline-flex;
+    align-items: center;
+
+    background: var(--accent-soft);
+    color: var(--accent-primary);
+
+    font-size: 0.76rem;
+    font-weight: 750;
+}
+
+.popular-stock-button {
+    margin-top: auto;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    width: 100%;
+    min-height: 46px;
+    padding: 0 14px;
+
+    border-radius: 15px;
+    border: 1px solid rgba(37, 99, 235, 0.16);
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--accent-primary);
+
+    font-size: 0.94rem;
+    font-weight: 800;
+    cursor: pointer;
+
+    transition:
+            border-color var(--transition-fast),
+            background var(--transition-fast),
+            box-shadow var(--transition-fast),
+            color var(--transition-fast);
+}
+
+.popular-stock-button:hover {
+    border-color: var(--accent-primary);
+    background: var(--accent-primary);
+    color: #ffffff;
+    box-shadow: 0 12px 22px rgba(37, 99, 235, 0.16);
+}
+
+/* =========================
+   Popular Stocks Responsive
+========================= */
+@media (max-width: 1050px) {
+    .popular-stocks-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .popular-stocks-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .popular-stock-card {
+        min-height: auto;
+        padding: 18px 16px;
+        border-radius: 18px;
+    }
+
+    .popular-stock-price {
+        font-size: 1.45rem;
+    }
+}
+
+/* Clickable stock card */
+.clickable-stock-card {
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.clickable-stock-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px rgba(37, 99, 235, 0.12);
+}
+
+/* Prevent button from feeling like part of click area */
+.popular-stock-button {
+    position: relative;
+    z-index: 2;
+}
+
+/* Focus (accessibility) */
+.clickable-stock-card:focus-visible {
+    outline: 3px solid var(--accent-soft);
+    border-color: var(--accent-primary);
+}

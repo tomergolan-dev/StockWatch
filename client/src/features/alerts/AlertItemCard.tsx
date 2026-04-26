@@ -1,6 +1,13 @@
 import { AxiosError } from "axios";
 import { useState } from "react";
-import { ArrowDown, ArrowUp, BadgePercent, DollarSign } from "lucide-react";
+import {
+    ArrowDown,
+    ArrowUp,
+    BadgePercent,
+    BellRing,
+    DollarSign,
+    Trash2,
+} from "lucide-react";
 import { deleteAlert } from "../../api/alerts.api";
 import type { AlertItem } from "../../types/alerts.types";
 
@@ -9,13 +16,15 @@ type AlertItemCardProps = {
     onDeleted: (id: string) => void;
 };
 
-/* Display a single alert card with status, metadata, and delete action */
+/* Display a single alert card with metadata and actions */
 function AlertItemCard({ alert, onDeleted }: AlertItemCardProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [showConfirm, setShowConfirm] = useState(false);
 
     const isActive = alert.isActive;
+    const isPriceMetric = alert.metric === "price";
+    const isDirectionUp = alert.direction === "up";
 
     const handleDelete = async () => {
         if (!isActive) {
@@ -48,78 +57,97 @@ function AlertItemCard({ alert, onDeleted }: AlertItemCardProps) {
 
     return (
         <>
-            <article className={`alert-card ${isActive ? "active-card" : "triggered-card"}`}>
-                <div className="alert-card-main">
-                    <div className="alert-card-top">
-                        <div className="alert-card-title-group">
-                            <h3 className="alert-symbol">{alert.symbol}</h3>
-
-                            <span
-                                className={`alert-status ${
-                                    isActive ? "active" : "inactive"
-                                }`}
-                            >
-                                {isActive ? "Active" : "Triggered"}
-                            </span>
-                        </div>
-
-                        <div className="alert-meta-row">
-                            <span className="alert-chip">
-                                {alert.metric === "price" ? (
-                                    <DollarSign size={14} />
-                                ) : (
-                                    <BadgePercent size={14} />
-                                )}
-                                <span>
-                                    {alert.metric === "price" ? "Price" : "Percent"}
-                                </span>
-                            </span>
-
-                            <span className="alert-chip">
-                                {alert.direction === "up" ? (
-                                    <ArrowUp size={14} />
-                                ) : (
-                                    <ArrowDown size={14} />
-                                )}
-                                <span>
-                                    {alert.direction === "up" ? "Up" : "Down"}
-                                </span>
-                            </span>
-                        </div>
+            <article
+                className={`alert-card ${
+                    isActive ? "active-card" : "triggered-card"
+                }`}
+            >
+                <div className="alert-card-top">
+                    <div>
+                        <h3 className="alert-symbol">{alert.symbol}</h3>
+                        <p className="alert-subtitle">
+                            {isPriceMetric ? "Price alert" : "Percent alert"}
+                        </p>
                     </div>
 
-                    <p className="alert-description">
-                        Trigger when{" "}
-                        {alert.metric === "price" ? "price" : "percent change"} goes{" "}
-                        {alert.direction === "up" ? "above" : "below"}{" "}
-                        <strong>{alert.value}</strong>
-                    </p>
-
-                    <p className="alert-triggered-at">
-                        {alert.triggeredAt
-                            ? `Triggered at: ${new Date(alert.triggeredAt).toLocaleString()}`
-                            : "Not triggered yet"}
-                    </p>
-
-                    {errorMessage ? (
-                        <p className="form-error alert-message">{errorMessage}</p>
-                    ) : null}
+                    <span
+                        className={`alert-status ${
+                            isActive ? "active" : "inactive"
+                        }`}
+                    >
+                        {isActive ? "Active" : "Triggered"}
+                    </span>
                 </div>
+
+                <div className="alert-value-block">
+                    <span className="alert-value-label">Target value</span>
+                    <span className="alert-value">
+                        {isPriceMetric ? "$" : ""}
+                        {alert.value}
+                        {!isPriceMetric ? "%" : ""}
+                    </span>
+                </div>
+
+                <div className="alert-meta-row">
+                    <span className="alert-chip">
+                        {isPriceMetric ? (
+                            <DollarSign size={14} />
+                        ) : (
+                            <BadgePercent size={14} />
+                        )}
+                        <span>{isPriceMetric ? "Price" : "Percent"}</span>
+                    </span>
+
+                    <span className="alert-chip">
+                        {isDirectionUp ? (
+                            <ArrowUp size={14} />
+                        ) : (
+                            <ArrowDown size={14} />
+                        )}
+                        <span>{isDirectionUp ? "Up" : "Down"}</span>
+                    </span>
+                </div>
+
+                <p className="alert-description">
+                    Trigger when {isPriceMetric ? "price" : "percent change"} goes{" "}
+                    {isDirectionUp ? "above" : "below"}{" "}
+                    <strong>
+                        {isPriceMetric ? "$" : ""}
+                        {alert.value}
+                        {!isPriceMetric ? "%" : ""}
+                    </strong>
+                    .
+                </p>
+
+                <p className="alert-triggered-at">
+                    {alert.triggeredAt
+                        ? `Triggered at: ${new Date(alert.triggeredAt).toLocaleString()}`
+                        : "Not triggered yet"}
+                </p>
+
+                {errorMessage ? (
+                    <p className="form-error alert-message">{errorMessage}</p>
+                ) : null}
 
                 <div className="alert-card-actions">
                     <button
                         type="button"
-                        className="watchlist-remove-button"
+                        className="alert-delete-button"
                         onClick={() => setShowConfirm(true)}
                         disabled={!isActive || isDeleting}
-                        title={!isActive ? "Triggered alerts cannot be deleted" : "Delete alert"}
+                        title={
+                            !isActive
+                                ? "Triggered alerts cannot be deleted"
+                                : "Delete alert"
+                        }
                     >
-                        {!isActive ? "Triggered" : "Delete Alert"}
+                        {isActive ? <Trash2 size={16} /> : <BellRing size={16} />}
+                        <span>{!isActive ? "Triggered" : "Delete Alert"}</span>
                     </button>
                 </div>
             </article>
 
-            {showConfirm && isActive && (
+            {showConfirm && isActive ? (
                 <div className="modal-overlay">
                     <div className="modal-box">
                         <h3>Delete alert?</h3>
@@ -140,7 +168,7 @@ function AlertItemCard({ alert, onDeleted }: AlertItemCardProps) {
 
                             <button
                                 type="button"
-                                className="watchlist-remove-button"
+                                className="alert-delete-button modal-delete-button"
                                 onClick={handleDelete}
                                 disabled={isDeleting}
                             >
@@ -149,7 +177,7 @@ function AlertItemCard({ alert, onDeleted }: AlertItemCardProps) {
                         </div>
                     </div>
                 </div>
-            )}
+            ) : null}
         </>
     );
 }

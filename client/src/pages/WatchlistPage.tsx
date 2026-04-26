@@ -54,8 +54,8 @@ function WatchlistPage() {
                     <p className="dashboard-search-eyebrow">Your Favorites</p>
                     <h1 className="page-title">Watchlist</h1>
                     <p className="page-description">
-                        Track the stocks you care about most, remove symbols anytime,
-                        and jump directly to alert creation.
+                        Track your favorite stocks with daily market data, create alerts,
+                        and remove symbols anytime.
                     </p>
                 </div>
             </div>

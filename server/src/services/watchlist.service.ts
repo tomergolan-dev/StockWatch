@@ -94,7 +94,11 @@ export const getUserWatchlist = async (userId: string) => {
                     companyName: item.companyName,
                     currentPrice: data.c,
                     change: data.d,
-                    percentChange: data.dp
+                    percentChange: data.dp,
+                    high: data.h,
+                    low: data.l,
+                    open: data.o,
+                    previousClose: data.pc
                 };
             } catch {
                 // If API fails, still return base data
@@ -103,7 +107,11 @@ export const getUserWatchlist = async (userId: string) => {
                     companyName: item.companyName,
                     currentPrice: null,
                     change: null,
-                    percentChange: null
+                    percentChange: null,
+                    high: null,
+                    low: null,
+                    open: null,
+                    previousClose: null
                 };
             }
         })
