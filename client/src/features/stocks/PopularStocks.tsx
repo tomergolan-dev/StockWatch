@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
+import { Eye, ImageOff, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { axiosClient } from "../../api/axiosClient";
 import { addToWatchlist } from "../../api/watchlist.api";
@@ -17,29 +17,55 @@ type PopularStock = {
     previousClose: number;
 };
 
-type StockBrand = {
-    name: string;
-    logoText: string;
-    logoClass: string;
+type PopularStockMeta = {
+    companyName: string;
+    logoUrl: string;
 };
 
-const popularSymbols = ["AAPL", "MSFT", "NVDA", "GOOGL", "TSLA", "AMZN"];
+const popularSymbols = ["AAPL", "MSFT", "NVDA", "GOOGL", "TSLA", "AMZN", "META", "NFLX"];
 
-const stockBrands: Record<string, StockBrand> = {
-    AAPL: { name: "Apple Inc.", logoText: "A", logoClass: "apple" },
-    MSFT: { name: "Microsoft Corp.", logoText: "M", logoClass: "microsoft" },
-    NVDA: { name: "NVIDIA Corp.", logoText: "N", logoClass: "nvidia" },
-    GOOGL: { name: "Alphabet Inc.", logoText: "G", logoClass: "google" },
-    TSLA: { name: "Tesla Inc.", logoText: "T", logoClass: "tesla" },
-    AMZN: { name: "Amazon.com Inc.", logoText: "A", logoClass: "amazon" },
+const popularStockMeta: Record<string, PopularStockMeta> = {
+    AAPL: {
+        companyName: "Apple Inc.",
+        logoUrl: "/stock-logos/aapl.png",
+    },
+    MSFT: {
+        companyName: "Microsoft Corp.",
+        logoUrl: "/stock-logos/msft.png",
+    },
+    NVDA: {
+        companyName: "NVIDIA Corp.",
+        logoUrl: "/stock-logos/nvda.png",
+    },
+    GOOGL: {
+        companyName: "Alphabet Inc.",
+        logoUrl: "/stock-logos/googl.png",
+    },
+    TSLA: {
+        companyName: "Tesla Inc.",
+        logoUrl: "/stock-logos/tsla.png",
+    },
+    AMZN: {
+        companyName: "Amazon.com Inc.",
+        logoUrl: "/stock-logos/amzn.png",
+    },
+    META: {
+        companyName: "Meta Platforms Inc.",
+        logoUrl: "/stock-logos/meta.png",
+    },
+    NFLX: {
+        companyName: "Netflix Inc.",
+        logoUrl: "/stock-logos/nflx.png",
+    },
 };
 
-/* Display popular market stocks */
+/* Display popular stocks as clean market cards */
 function PopularStocks() {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
     const [stocks, setStocks] = useState<PopularStock[]>([]);
+    const [failedLogos, setFailedLogos] = useState<Record<string, boolean>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
     const [actionMessage, setActionMessage] = useState("");
@@ -73,6 +99,13 @@ function PopularStocks() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleLogoError = (symbol: string) => {
+        setFailedLogos((current) => ({
+            ...current,
+            [symbol]: true,
+        }));
     };
 
     const handleAddToWatchlist = async (
@@ -111,11 +144,11 @@ function PopularStocks() {
 
     if (isLoading) {
         return (
-            <section className="popular-stocks-grid">
+            <div className="popular-stocks-grid">
                 {popularSymbols.map((symbol) => (
                     <article key={symbol} className="popular-stock-card skeleton" />
                 ))}
-            </section>
+            </div>
         );
     }
 
@@ -133,8 +166,9 @@ function PopularStocks() {
 
             <div className="popular-stocks-grid">
                 {stocks.map((stock) => {
-                    const brand = stockBrands[stock.symbol];
+                    const meta = popularStockMeta[stock.symbol];
                     const isPositive = stock.change >= 0;
+                    const hasLogoFailed = failedLogos[stock.symbol];
 
                     return (
                         <article
@@ -149,20 +183,33 @@ function PopularStocks() {
                                 }
                             }}
                         >
-                            <div className="popular-stock-header-row">
-                                <div className="popular-stock-company">
-                                    <div className={`popular-stock-logo ${brand.logoClass}`}>
-                                        {brand.logoText}
+                            <div className="popular-stock-header">
+                                <div className="popular-stock-identity">
+                                    <div className="popular-stock-logo-shell">
+                                        {!hasLogoFailed ? (
+                                            <img
+                                                src={meta.logoUrl}
+                                                alt={`${meta.companyName} logo`}
+                                                className="popular-stock-logo"
+                                                loading="lazy"
+                                                referrerPolicy="no-referrer"
+                                                onError={() => handleLogoError(stock.symbol)}
+                                            />
+                                        ) : (
+                                            <div className="popular-stock-logo-fallback">
+                                                <ImageOff size={18} />
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <div>
+                                    <div className="popular-stock-title-block">
                                         <h3>{stock.symbol}</h3>
-                                        <p>{brand.name}</p>
+                                        <p>{meta.companyName}</p>
                                     </div>
                                 </div>
 
                                 <span
-                                    className={`popular-stock-percent ${
+                                    className={`popular-stock-change-badge ${
                                         isPositive ? "positive" : "negative"
                                     }`}
                                 >
@@ -186,7 +233,7 @@ function PopularStocks() {
 
                             <div className="popular-stock-divider" />
 
-                            <div className="popular-stock-meta">
+                            <div className="popular-stock-meta-grid">
                                 <div>
                                     <span>Open</span>
                                     <strong>${stock.open.toFixed(2)}</strong>
@@ -203,16 +250,30 @@ function PopularStocks() {
                                 </div>
                             </div>
 
-                            <button
-                                type="button"
-                                className="popular-stock-button"
-                                onClick={(event) =>
-                                    handleAddToWatchlist(event, stock.symbol)
-                                }
-                            >
-                                <Plus size={16} />
-                                <span>Add to Watchlist</span>
-                            </button>
+                            <div className="stock-card-actions">
+                                <button
+                                    type="button"
+                                    className="stock-add-button"
+                                    onClick={(event) =>
+                                        handleAddToWatchlist(event, stock.symbol)
+                                    }
+                                >
+                                    <Plus size={16} />
+                                    <span>Watchlist</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="stock-view-button"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        navigate(`/stock/${stock.symbol}`);
+                                    }}
+                                >
+                                    <Eye size={16} />
+                                    <span>View</span>
+                                </button>
+                            </div>
                         </article>
                     );
                 })}

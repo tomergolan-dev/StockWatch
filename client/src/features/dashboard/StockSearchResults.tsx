@@ -7,7 +7,7 @@ type StockSearchResultsProps = {
     isLoading: boolean;
 };
 
-/* Render stock search results */
+/* Render stock search results as responsive cards */
 function StockSearchResults({
                                 stocks,
                                 hasSearched,
@@ -35,12 +35,18 @@ function StockSearchResults({
 
     return (
         <section className="stock-results-section">
-            <div className="stock-results-header">
-                <h2>Search results</h2>
-                <p>Click a result to open stock details.</p>
+            <div className="dashboard-section-header compact">
+                <div>
+                    <p className="dashboard-eyebrow">Search Results</p>
+                    <h2 className="dashboard-section-title">Matching stocks</h2>
+                </div>
+
+                <p className="dashboard-section-description">
+                    Click a card to open stock details.
+                </p>
             </div>
 
-            <div className="stock-results-list">
+            <div className="stock-results-grid">
                 {stocks.map((stock) => (
                     <StockSearchResultCard
                         key={`${stock.symbol}-${stock.description}`}

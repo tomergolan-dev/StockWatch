@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
-import { Plus } from "lucide-react";
+import {ExternalLink, Eye, Plus, X} from "lucide-react";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { addToWatchlist } from "../../api/watchlist.api";
 import { useAuth } from "../../hooks/useAuth";
@@ -10,18 +11,20 @@ type StockSearchResultCardProps = {
     stock: StockSearchItem;
 };
 
-/* Display a single search result */
+/* Display a single stock search result with preview and watchlist action */
 function StockSearchResultCard({ stock }: StockSearchResultCardProps) {
-    const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
 
-    const [isAdding, setIsAdding] = useState(false);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [message, setMessage] = useState("");
+    const [isAdding, setIsAdding] = useState(false);
 
     const handleAddToWatchlist = async (
         event: React.MouseEvent<HTMLButtonElement>
     ) => {
         event.stopPropagation();
+        setMessage("");
 
         if (!isAuthenticated) {
             navigate("/login");
@@ -29,7 +32,6 @@ function StockSearchResultCard({ stock }: StockSearchResultCardProps) {
         }
 
         setIsAdding(true);
-        setMessage("");
 
         try {
             await addToWatchlist({ symbol: stock.symbol });
@@ -51,45 +53,106 @@ function StockSearchResultCard({ stock }: StockSearchResultCardProps) {
         }
     };
 
-    return (
-        <article
-            className="stock-result-card"
-            onClick={() => navigate(`/stock/${stock.symbol}`)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                    navigate(`/stock/${stock.symbol}`);
-                }
-            }}
-        >
-            <div className="stock-result-logo">
-                {stock.symbol.slice(0, 1)}
-            </div>
+    const previewModal = isPreviewOpen
+        ? createPortal(
+            <div className="modal-overlay">
+                <div className="modal-box stock-preview-modal">
+                    <div className="stock-preview-header">
+                        <div>
+                            <p className="dashboard-eyebrow">Stock Preview</p>
+                            <h3>{stock.symbol}</h3>
+                            <p className="modal-subtext">{stock.description}</p>
+                        </div>
 
-            <div className="stock-result-main">
-                <div className="stock-result-title-row">
-                    <h3>{stock.symbol}</h3>
-                    <span>{stock.type}</span>
+                        <button
+                            type="button"
+                            className="stock-preview-close"
+                            onClick={() => setIsPreviewOpen(false)}
+                            aria-label="Close stock preview"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+
+                    <div className="stock-preview-body">
+                        <div className="stock-preview-row">
+                            <span>Symbol</span>
+                            <strong>{stock.symbol}</strong>
+                        </div>
+
+                        <div className="stock-preview-row">
+                            <span>Company / Description</span>
+                            <strong>{stock.description}</strong>
+                        </div>
+
+                        <div className="stock-preview-row">
+                            <span>Type</span>
+                            <strong>{stock.type || "Stock"}</strong>
+                        </div>
+                    </div>
+
+                    <div className="modal-actions">
+                        <button
+                            type="button"
+                            className="auth-secondary-button"
+                            onClick={() => setIsPreviewOpen(false)}
+                        >
+                            Back to results
+                        </button>
+
+                        <button
+                            type="button"
+                            className="primary-button"
+                            onClick={() => navigate(`/stock/${stock.symbol}`)}
+                        >
+                            <ExternalLink size={16} />
+                            <span>Full Details</span>
+                        </button>
+                    </div>
+                </div>
+            </div>,
+            document.body
+        )
+        : null;
+
+    return (
+        <>
+            <article className="stock-card">
+                <div className="stock-card-top">
+                    <div>
+                        <h3 className="stock-symbol">{stock.symbol}</h3>
+                        <p className="stock-description">{stock.description}</p>
+                    </div>
+
+                    <span className="stock-type-pill">{stock.type || "Stock"}</span>
                 </div>
 
-                <p>{stock.description}</p>
-            </div>
+                {message ? <p className="stock-card-message">{message}</p> : null}
 
-            <div className="stock-result-actions">
-                <button
-                    type="button"
-                    className="stock-result-button"
-                    onClick={handleAddToWatchlist}
-                    disabled={isAdding}
-                >
-                    <Plus size={16} />
-                    <span>{isAdding ? "Adding..." : "Watchlist"}</span>
-                </button>
+                <div className="stock-card-actions">
+                    <button
+                        type="button"
+                        className="stock-add-button"
+                        onClick={handleAddToWatchlist}
+                        disabled={isAdding}
+                    >
+                        <Plus size={16} />
+                        <span>{isAdding ? "Adding..." : "Add to Watchlist"}</span>
+                    </button>
 
-                {message ? <p className="stock-result-message">{message}</p> : null}
-            </div>
-        </article>
+                    <button
+                        type="button"
+                        className="stock-view-button"
+                        onClick={() => setIsPreviewOpen(true)}
+                    >
+                        <Eye size={16} />
+                        <span>View</span>
+                    </button>
+                </div>
+            </article>
+
+            {previewModal}
+        </>
     );
 }
 
