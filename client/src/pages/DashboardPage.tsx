@@ -164,8 +164,8 @@ function DashboardPage() {
 
             <section className="dashboard-section">
                 <div className="dashboard-section-header">
+                    <p className="dashboard-eyebrow">Popular Stocks</p>
                     <div>
-                        <p className="dashboard-eyebrow">Popular Stocks</p>
                         <h2 className="dashboard-section-title">Trending symbols</h2>
                     </div>
 

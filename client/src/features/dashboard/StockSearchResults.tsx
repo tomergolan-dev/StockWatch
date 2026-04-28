@@ -36,8 +36,8 @@ function StockSearchResults({
     return (
         <section className="stock-results-section">
             <div className="dashboard-section-header compact">
+                <p className="dashboard-eyebrow">Search Results</p>
                 <div>
-                    <p className="dashboard-eyebrow">Search Results</p>
                     <h2 className="dashboard-section-title">Matching stocks</h2>
                 </div>
 
