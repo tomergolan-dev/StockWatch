@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
+import {useMemo, useState, type ChangeEvent, type FormEvent, useEffect} from "react";
 import { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -33,6 +33,10 @@ function RegisterPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    useEffect(() => {
+        document.title = "StockWatch | Register";
+    }, []);
 
     const passwordRules = useMemo<PasswordRule[]>(
         () => [

@@ -52,6 +52,10 @@ function NotificationsPage() {
     };
 
     useEffect(() => {
+        document.title = "StockWatch | Notifications";
+    }, []);
+
+    useEffect(() => {
         void loadNotifications();
     }, []);
 

@@ -46,6 +46,12 @@ function StockPage() {
     );
 
     useEffect(() => {
+        if (!stock) return;
+
+        document.title = `StockWatch | ${stock.symbol} `;
+    }, [stock]);
+
+    useEffect(() => {
         if (!isAuthenticated) {
             setWatchlistItems([]);
             setShowAlertModal(false);

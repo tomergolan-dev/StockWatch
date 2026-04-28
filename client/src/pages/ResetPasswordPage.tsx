@@ -35,6 +35,10 @@ function ResetPasswordPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+    useEffect(() => {
+        document.title = "StockWatch | Reset Password";
+    }, []);
+
     const passwordRules = useMemo<PasswordRule[]>(
         () => [
             {

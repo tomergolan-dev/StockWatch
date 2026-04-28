@@ -42,6 +42,10 @@ function AlertsPage() {
     };
 
     useEffect(() => {
+        document.title = "StockWatch | Alerts";
+    }, []);
+
+    useEffect(() => {
         void loadAlerts();
     }, []);
 

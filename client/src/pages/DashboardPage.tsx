@@ -89,6 +89,10 @@ function DashboardPage() {
     };
 
     useEffect(() => {
+        document.title = "StockWatch | Dashboard";
+    }, []);
+
+    useEffect(() => {
         const trimmedQuery = query.trim();
 
         if (!isSuggestionsOpen || trimmedQuery.length < 2) {

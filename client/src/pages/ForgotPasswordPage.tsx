@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import {useState, type ChangeEvent, type FormEvent, useEffect} from "react";
 import { AxiosError } from "axios";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "../api/auth.api";
@@ -9,6 +9,10 @@ function ForgotPasswordPage() {
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        document.title = "StockWatch | Forgot Password";
+    }, []);
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);

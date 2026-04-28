@@ -15,6 +15,10 @@ function ProfilePage() {
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
     useEffect(() => {
+        document.title = "StockWatch | My Profile";
+    }, []);
+
+    useEffect(() => {
         const loadProfile = async () => {
             setIsLoading(true);
             setErrorMessage("");

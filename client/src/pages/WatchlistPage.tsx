@@ -42,6 +42,10 @@ function WatchlistPage() {
     };
 
     useEffect(() => {
+        document.title = "StockWatch | Watchlist";
+    }, []);
+
+    useEffect(() => {
         void loadWatchlist();
     }, []);
 

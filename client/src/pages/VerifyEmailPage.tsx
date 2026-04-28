@@ -19,6 +19,10 @@ function VerifyEmailPage() {
     );
 
     useEffect(() => {
+        document.title = "StockWatch | Verify Email";
+    }, []);
+
+    useEffect(() => {
         if (!token || hasRequestedRef.current) {
             return;
         }
