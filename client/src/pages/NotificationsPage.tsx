@@ -93,7 +93,7 @@ function NotificationsPage() {
     }, [sortedNotifications, statusFilter, timeFilter]);
 
     return (
-        <section className="page-surface notifications-page">
+        <section className="notifications-page">
             <div className="notifications-hero">
                 <div className="notifications-copy">
                     <p className="dashboard-search-eyebrow">Your Notifications</p>

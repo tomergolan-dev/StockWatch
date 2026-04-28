@@ -112,21 +112,38 @@
     gap: 16px;
 }
 
-.profile-readonly-input {
+.profile-readonly-input,
+.profile-readonly-input:disabled {
     cursor: not-allowed;
-    opacity: 0.82;
+    opacity: 0.68;
+    color: var(--text-muted);
+    background: var(--bg-soft) !important;
+    border-color: var(--border-color) !important;
 }
 
 .profile-readonly-input:hover,
-.profile-readonly-input:focus {
+.profile-readonly-input:focus,
+.profile-readonly-input:disabled:hover,
+.profile-readonly-input:disabled:focus {
+    color: var(--text-muted);
+    background: var(--bg-soft) !important;
     border-color: var(--border-color) !important;
     box-shadow: none !important;
-    background: rgba(255, 255, 255, 0.86) !important;
+}
+
+:root[data-theme="dark"] .profile-readonly-input,
+:root[data-theme="dark"] .profile-readonly-input:disabled {
+    background: rgba(13, 22, 39, 0.58) !important;
+    color: var(--text-soft);
 }
 
 :root[data-theme="dark"] .profile-readonly-input:hover,
-:root[data-theme="dark"] .profile-readonly-input:focus {
-    background: rgba(13, 22, 39, 0.82) !important;
+:root[data-theme="dark"] .profile-readonly-input:focus,
+:root[data-theme="dark"] .profile-readonly-input:disabled:hover,
+:root[data-theme="dark"] .profile-readonly-input:disabled:focus {
+    background: rgba(13, 22, 39, 0.58) !important;
+    color: var(--text-soft);
+    box-shadow: none !important;
 }
 
 .profile-card-footer {

@@ -44,7 +44,7 @@ function ProfilePage() {
 
     return (
         <>
-            <section className="page-surface profile-page">
+            <section className="profile-page">
                 <div className="profile-hero">
                     <div className="profile-copy">
                         <p className="dashboard-search-eyebrow">Account Settings</p>

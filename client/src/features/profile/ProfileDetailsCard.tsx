@@ -98,6 +98,7 @@ function ProfileDetailsCard() {
                     <label htmlFor="profileFirstName">First name</label>
                     <input
                         id="profileFirstName"
+                        className={!isEditing ? "profile-readonly-input" : ""}
                         value={firstName}
                         onChange={(event) => setFirstName(event.target.value)}
                         disabled={!isEditing || isSaving}
@@ -109,6 +110,7 @@ function ProfileDetailsCard() {
                     <label htmlFor="profileLastName">Last name</label>
                     <input
                         id="profileLastName"
+                        className={!isEditing ? "profile-readonly-input" : ""}
                         value={lastName}
                         onChange={(event) => setLastName(event.target.value)}
                         disabled={!isEditing || isSaving}
