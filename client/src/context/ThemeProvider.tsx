@@ -1,24 +1,12 @@
-/* eslint-disable react-refresh/only-export-components */
-
 import {
-    createContext,
     useCallback,
     useEffect,
     useMemo,
     useState,
     type ReactNode,
 } from "react";
+import { ThemeContext, type ThemeMode } from "./ThemeContext";
 import { getFallbackIsDark, shouldUseDarkBySun } from "../utils/sunTime";
-
-export type ThemeMode = "auto" | "light" | "dark";
-
-type ThemeContextValue = {
-    themeMode: ThemeMode;
-    isDark: boolean;
-    toggleTheme: () => void;
-    setThemeMode: (mode: ThemeMode) => void;
-    setAutoTheme: () => void;
-};
 
 type ThemeProviderProps = {
     children: ReactNode;
@@ -30,8 +18,6 @@ type Coordinates = {
 };
 
 const THEME_MODE_KEY = "themeMode";
-
-export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function getStoredThemeMode(): ThemeMode {
     const stored = localStorage.getItem(THEME_MODE_KEY);
@@ -95,8 +81,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         if (themeMode !== "auto") return;
 
         if (!navigator.geolocation) {
-            updateAutoTheme(null);
-            return;
+            const timeoutId = window.setTimeout(() => {
+                updateAutoTheme(null);
+            }, 0);
+
+            return () => window.clearTimeout(timeoutId);
         }
 
         navigator.geolocation.getCurrentPosition(
@@ -109,7 +98,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
                 setCoords(newCoords);
                 updateAutoTheme(newCoords);
             },
-            () => updateAutoTheme(null)
+            () => {
+                window.setTimeout(() => {
+                    updateAutoTheme(null);
+                }, 0);
+            }
         );
     }, [themeMode, updateAutoTheme]);
 
