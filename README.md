@@ -136,11 +136,11 @@ npm run dev
 ---
 
 ## 🧪 Future Improvements
-	•	Real-time stock updates (WebSockets)
-	•	Advanced charts
-	•	Portfolio tracking
-	•	Performance optimizations
-	•	Push notifications
+- Real-time stock updates (WebSockets)
+- Advanced charts
+- Portfolio tracking
+- Performance optimizations
+- Push notifications
 
 ## 👨‍💻 Author
 
