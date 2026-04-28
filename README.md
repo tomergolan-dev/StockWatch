@@ -77,3 +77,72 @@ The system focuses on **clean UX, real-time updates, and scalable architecture**
 ## 🏗️ Architecture
 
 Project follows a **feature-based structure**:
+src/
+features/
+stocks/
+watchlist/
+alerts/
+notifications/
+components/
+layout/
+ui/
+pages/
+hooks/
+context/
+
+### Key Concepts:
+- Separation of concerns (logic / layout / UI)
+- Reusable components (Card, List, Modal)
+- Global state via Context
+- API abstraction layer
+
+---
+
+## 🔐 Authentication
+
+- JWT-based authentication
+- Protected routes
+- UI adapts instantly on login/logout
+
+---
+
+## ⚡ UX Improvements Implemented
+
+- Logout confirmation modal
+- Instant UI sync after logout
+- Disabled / hidden actions based on user state
+- Modal-based interactions instead of page navigation
+- Consistent card design across the app
+
+---
+
+## 🌗 Theme System
+
+- Light / Dark / Auto mode
+- Auto mode uses geolocation + sunrise/sunset logic
+- Theme persists across refresh
+- Charts sync dynamically with theme
+
+---
+
+## 📦 Installation
+
+```bash
+git clone https://github.com/your-username/StockWatch.git
+cd StockWatch
+npm install
+npm run dev
+
+---
+
+## 🧪 Future Improvements
+	•	Real-time stock updates (WebSockets)
+	•	Advanced charts
+	•	Portfolio tracking
+	•	Performance optimizations
+	•	Push notifications
+
+## 👨‍💻 Author
+
+Tomer Golan
+Full Stack Developer
