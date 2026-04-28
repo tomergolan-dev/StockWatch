@@ -1,5 +1,5 @@
-import WatchlistItemCard from "./WatchlistItemCard";
 import type { WatchlistItem } from "../../types/watchlist.types";
+import WatchlistItemCard from "./WatchlistItemCard";
 
 type WatchlistListProps = {
     items: WatchlistItem[];
@@ -7,16 +7,12 @@ type WatchlistListProps = {
     onRemoved: (symbol: string) => void;
 };
 
-/* Render the user's watchlist items with empty and loading states */
-function WatchlistList({
-                           items,
-                           isLoading,
-                           onRemoved,
-                       }: WatchlistListProps) {
+/* Render the user's watchlist as responsive market cards */
+function WatchlistList({ items, isLoading, onRemoved }: WatchlistListProps) {
     if (isLoading) {
         return (
             <div className="watchlist-state">
-                <p className="page-description">Loading your watchlist...</p>
+                <p className="page-description">Loading watchlist...</p>
             </div>
         );
     }
@@ -25,8 +21,7 @@ function WatchlistList({
         return (
             <div className="watchlist-state">
                 <p className="page-description">
-                    Your watchlist is empty. Search for stocks on the dashboard and add
-                    your favorites.
+                    Your watchlist is empty. Add stocks from the dashboard to start tracking them.
                 </p>
             </div>
         );

@@ -1,12 +1,13 @@
 import {
-    X,
-    LayoutDashboard,
     Bell,
     ChartNoAxesCombined,
-    LogOut,
+    LayoutDashboard,
     LogIn,
+    LogOut,
     UserPlus,
+    X,
 } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -18,6 +19,13 @@ type SideDrawerProps = {
 /* Display the slide-out navigation drawer */
 function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
     const { isAuthenticated, logout } = useAuth();
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+    const handleConfirmLogout = () => {
+        logout();
+        setShowLogoutConfirm(false);
+        onClose();
+    };
 
     return (
         <>
@@ -77,10 +85,7 @@ function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                             <button
                                 type="button"
                                 className="drawer-logout-button"
-                                onClick={() => {
-                                    logout();
-                                    onClose();
-                                }}
+                                onClick={() => setShowLogoutConfirm(true)}
                             >
                                 <LogOut size={18} />
                                 <span>Logout</span>
@@ -89,6 +94,34 @@ function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                     )}
                 </nav>
             </aside>
+
+            {showLogoutConfirm ? (
+                <div className="modal-overlay">
+                    <div className="modal-box">
+                        <h3>Log out?</h3>
+
+                        <p>Are you sure you want to log out?</p>
+
+                        <div className="modal-actions">
+                            <button
+                                type="button"
+                                className="auth-secondary-button"
+                                onClick={() => setShowLogoutConfirm(false)}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                className="stock-action-button danger"
+                                onClick={handleConfirmLogout}
+                            >
+                                Log out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </>
     );
 }

@@ -1,10 +1,20 @@
 import { AxiosError } from "axios";
+import {
+    ArrowLeft,
+    BellPlus,
+    Check,
+    Plus,
+    Trash2,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { axiosClient } from "../api/axiosClient";
-import { useTheme } from "../hooks/useTheme";
+import { addToWatchlist, getWatchlist, removeFromWatchlist } from "../api/watchlist.api";
+import CreateAlertModal from "../features/alerts/CreateAlertModal.tsx";
+import { useAuth } from "../hooks/useAuth";
+import type { WatchlistItem } from "../types/watchlist.types";
 
-type StockDetails = {
+type StockData = {
     symbol: string;
     currentPrice: number;
     change: number;
@@ -17,59 +27,167 @@ type StockDetails = {
 
 function StockPage() {
     const { symbol } = useParams<{ symbol: string }>();
-    const { isDark } = useTheme();
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
 
-    const cleanSymbol = useMemo(
-        () => (symbol || "").toUpperCase().replace(/[^A-Z.]/g, ""),
-        [symbol]
+    const [stock, setStock] = useState<StockData | null>(null);
+    const [watchlistItems, setWatchlistItems] = useState<WatchlistItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isWatchlistActionLoading, setIsWatchlistActionLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [actionMessage, setActionMessage] = useState("");
+    const [logoFailed, setLogoFailed] = useState(false);
+    const [showAlertModal, setShowAlertModal] = useState(false);
+    const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+    const [chartTheme, setChartTheme] = useState<"light" | "dark">(
+        document.documentElement.getAttribute("data-theme") === "dark"
+            ? "dark"
+            : "light"
     );
 
-    const [stock, setStock] = useState<StockDetails | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState("");
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setWatchlistItems([]);
+            setShowAlertModal(false);
+            setShowRemoveConfirm(false);
+        }
+    }, [isAuthenticated]);
+
+    const normalizedSymbol = symbol?.replace(/[^\w.-]/g, "").toUpperCase() || "";
+    const logoSrc = `/stock-logos/${normalizedSymbol.toLowerCase()}.png`;
+
+    const isInWatchlist = useMemo(
+        () =>
+            watchlistItems.some(
+                (item) => item.symbol.toUpperCase() === normalizedSymbol
+            ),
+        [watchlistItems, normalizedSymbol]
+    );
+
+    const getErrorMessage = (error: unknown, fallback: string) => {
+        if (error instanceof AxiosError) {
+            const responseMessage = error.response?.data?.message;
+
+            if (typeof responseMessage === "string" && responseMessage.trim()) {
+                return responseMessage;
+            }
+        }
+
+        return fallback;
+    };
+
+    const loadStock = async () => {
+        if (!normalizedSymbol) {
+            setErrorMessage("Invalid stock symbol.");
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
+        setErrorMessage("");
+
+        try {
+            const stockResponse = await axiosClient.get<{
+                success: boolean;
+                data: StockData;
+            }>(`/api/stocks/${normalizedSymbol}`);
+
+            setStock(stockResponse.data.data);
+
+            if (isAuthenticated) {
+                const watchlistResponse = await getWatchlist();
+                setWatchlistItems(watchlistResponse.data);
+            }
+        } catch (error: unknown) {
+            setErrorMessage(getErrorMessage(error, "Failed to load stock."));
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleAddToWatchlist = async () => {
+        setActionMessage("");
+
+        if (!isAuthenticated) {
+            navigate("/login");
+            return;
+        }
+
+        setIsWatchlistActionLoading(true);
+
+        try {
+            await addToWatchlist({ symbol: normalizedSymbol });
+            const response = await getWatchlist();
+
+            setWatchlistItems(response.data);
+            setActionMessage(`${normalizedSymbol} added to your watchlist.`);
+        } catch (error: unknown) {
+            setActionMessage(
+                getErrorMessage(error, "Failed to add stock to watchlist.")
+            );
+        } finally {
+            setIsWatchlistActionLoading(false);
+        }
+    };
+
+    const handleRemoveFromWatchlist = async () => {
+        setActionMessage("");
+
+        if (!isAuthenticated) {
+            navigate("/login");
+            return;
+        }
+
+        setIsWatchlistActionLoading(true);
+
+        try {
+            await removeFromWatchlist(normalizedSymbol);
+
+            setWatchlistItems((currentItems) =>
+                currentItems.filter(
+                    (item) => item.symbol.toUpperCase() !== normalizedSymbol
+                )
+            );
+
+            setActionMessage(`${normalizedSymbol} removed from your watchlist.`);
+        } catch (error: unknown) {
+            setActionMessage(
+                getErrorMessage(error, "Failed to remove stock from watchlist.")
+            );
+        } finally {
+            setIsWatchlistActionLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const loadStock = async () => {
-            if (!cleanSymbol) {
-                setErrorMessage("Invalid stock symbol.");
-                setIsLoading(false);
-                return;
-            }
-
-            setIsLoading(true);
-            setErrorMessage("");
-
-            try {
-                const response = await axiosClient.get<{
-                    success: boolean;
-                    data: StockDetails;
-                }>(`/api/stocks/${cleanSymbol}`);
-
-                setStock(response.data.data);
-            } catch (error: unknown) {
-                let serverMessage = "Failed to load stock details.";
-
-                if (error instanceof AxiosError) {
-                    const responseMessage = error.response?.data?.message;
-
-                    if (typeof responseMessage === "string" && responseMessage.trim()) {
-                        serverMessage = responseMessage;
-                    }
-                }
-
-                setErrorMessage(serverMessage);
-            } finally {
-                setIsLoading(false);
-            }
+        const updateChartTheme = () => {
+            setChartTheme(
+                document.documentElement.getAttribute("data-theme") === "dark"
+                    ? "dark"
+                    : "light"
+            );
         };
 
+        updateChartTheme();
+
+        const observer = new MutationObserver(updateChartTheme);
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["data-theme"],
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
         void loadStock();
-    }, [cleanSymbol]);
+    }, [normalizedSymbol, isAuthenticated]);
 
     if (isLoading) {
         return (
-            <section className="page-surface stock-page">
-                <div className="stock-loading-card">
+            <section className="stock-page">
+                <div className="stock-state">
                     <p className="page-description">Loading stock...</p>
                 </div>
             </section>
@@ -78,61 +196,152 @@ function StockPage() {
 
     if (errorMessage || !stock) {
         return (
-            <section className="page-surface stock-page">
-                <p className="form-error">{errorMessage || "Stock not found."}</p>
+            <section className="stock-page">
+                <div className="stock-state">
+                    <p className="form-error">{errorMessage || "Stock not found."}</p>
+                </div>
             </section>
         );
     }
 
     const isPositive = stock.change >= 0;
-    const chartTheme = isDark ? "dark" : "light";
 
     return (
-        <section className="page-surface stock-page">
-            <div className="stock-header">
-                <div>
-                    <p className="dashboard-search-eyebrow">Stock Details</p>
-                    <h1 className="page-title">{stock.symbol}</h1>
-                    <p className="page-description">
-                        Daily market data and interactive TradingView chart.
+        <section className="stock-page">
+            <div className="stock-hero">
+                <button
+                    type="button"
+                    className="stock-back-button"
+                    onClick={() => navigate(-1)}
+                >
+                    <ArrowLeft size={16} />
+                    <span>Back</span>
+                </button>
+
+                <div className="stock-hero-main">
+                    <div className="stock-hero-identity">
+                        <div className="stock-logo-shell">
+                            {!logoFailed ? (
+                                <img
+                                    src={logoSrc}
+                                    alt={`${stock.symbol} logo`}
+                                    onError={() => setLogoFailed(true)}
+                                />
+                            ) : (
+                                <div className="stock-logo-fallback">
+                                    {stock.symbol.charAt(0)}
+                                </div>
+                            )}
+                        </div>
+
+                        <div>
+                            <h1 className="stock-title">{stock.symbol}</h1>
+                            <p className="stock-subtitle">Stock overview</p>
+                        </div>
+                    </div>
+
+                    <div className="stock-price-block">
+                        <div className="stock-price-row">
+                            <span className="stock-price">
+                                ${stock.currentPrice.toFixed(2)}
+                            </span>
+
+                            <span
+                                className={`stock-change ${
+                                    isPositive ? "positive" : "negative"
+                                }`}
+                            >
+                                {isPositive ? "+" : ""}
+                                {stock.change.toFixed(2)}
+                            </span>
+
+                            <span
+                                className={`stock-change-badge ${
+                                    isPositive ? "positive" : "negative"
+                                }`}
+                            >
+                                {isPositive ? "+" : ""}
+                                {stock.percentChange.toFixed(2)}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="stock-actions">
+                    {!isInWatchlist ? (
+                        <button
+                            type="button"
+                            className="stock-action-button primary"
+                            onClick={handleAddToWatchlist}
+                            disabled={isWatchlistActionLoading}
+                        >
+                            <Plus size={16} />
+                            <span>
+                                {isWatchlistActionLoading ? "Adding..." : "Watchlist"}
+                            </span>
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            className="stock-action-button tracked"
+                            disabled
+                        >
+                            <Check size={16} />
+                            <span>In Watchlist</span>
+                        </button>
+                    )}
+
+                    {isInWatchlist ? (
+                        <>
+                            <button
+                                type="button"
+                                className="stock-action-button secondary"
+                                onClick={() => setShowAlertModal(true)}
+                            >
+                                <BellPlus size={16} />
+                                <span>Create Alert</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                className="stock-action-button danger"
+                                onClick={() => setShowRemoveConfirm(true)}
+                                disabled={isWatchlistActionLoading}
+                            >
+                                <Trash2 size={16} />
+                                <span>
+                                    {isWatchlistActionLoading ? "Removing..." : "Remove"}
+                                </span>
+                            </button>
+                        </>
+                    ) : null}
+                </div>
+
+                {actionMessage ? (
+                    <p className="form-success stock-action-message">
+                        {actionMessage}
                     </p>
-                </div>
-
-                <div className="stock-price-row">
-                    <span className="stock-price">
-                        ${stock.currentPrice.toFixed(2)}
-                    </span>
-
-                    <span
-                        className={`stock-change-badge ${
-                            isPositive ? "positive" : "negative"
-                        }`}
-                    >
-                        {isPositive ? "+" : ""}
-                        {stock.change.toFixed(2)} ({isPositive ? "+" : ""}
-                        {stock.percentChange.toFixed(2)}%)
-                    </span>
-                </div>
+                ) : null}
             </div>
 
-            <div className="stock-metrics-grid">
-                <div className="stock-metric-card">
+            <div className="stock-metrics-clean">
+                <div>
                     <span>Open</span>
                     <strong>${stock.open.toFixed(2)}</strong>
                 </div>
 
-                <div className="stock-metric-card">
+                <div>
                     <span>High</span>
                     <strong>${stock.high.toFixed(2)}</strong>
                 </div>
 
-                <div className="stock-metric-card">
+                <div>
                     <span>Low</span>
                     <strong>${stock.low.toFixed(2)}</strong>
                 </div>
 
-                <div className="stock-metric-card">
-                    <span>Previous Close</span>
+                <div>
+                    <span>Prev Close</span>
                     <strong>${stock.previousClose.toFixed(2)}</strong>
                 </div>
             </div>
@@ -140,13 +349,53 @@ function StockPage() {
             <div className="stock-chart-box">
                 <iframe
                     key={`${stock.symbol}-${chartTheme}`}
-                    title={`${stock.symbol} chart`}
-                    src={`https://s.tradingview.com/widgetembed/?symbol=${stock.symbol}&interval=D&theme=${chartTheme}&style=1&locale=en`}
-                    width="100%"
-                    height="420"
-                    frameBorder="0"
+                    title={`${stock.symbol} stock chart`}
+                    src={`https://s.tradingview.com/widgetembed/?symbol=${stock.symbol}&interval=D&hidesidetoolbar=1&hidetoptoolbar=1&theme=${chartTheme}&style=1`}
                 />
             </div>
+
+            {showAlertModal ? (
+                <CreateAlertModal
+                    symbol={stock.symbol}
+                    onClose={() => setShowAlertModal(false)}
+                />
+            ) : null}
+
+            {showRemoveConfirm ? (
+                <div className="modal-overlay">
+                    <div className="modal-box">
+                        <h3>Remove stock?</h3>
+
+                        <p>
+                            Are you sure you want to remove{" "}
+                            <strong>{stock.symbol}</strong> from your watchlist?
+                        </p>
+
+                        <div className="modal-actions">
+                            <button
+                                type="button"
+                                className="auth-secondary-button"
+                                onClick={() => setShowRemoveConfirm(false)}
+                                disabled={isWatchlistActionLoading}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                className="stock-action-button danger"
+                                onClick={async () => {
+                                    await handleRemoveFromWatchlist();
+                                    setShowRemoveConfirm(false);
+                                }}
+                                disabled={isWatchlistActionLoading}
+                            >
+                                {isWatchlistActionLoading ? "Removing..." : "Yes, Remove"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </section>
     );
 }

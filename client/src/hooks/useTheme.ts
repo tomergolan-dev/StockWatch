@@ -1,12 +1,12 @@
 import { useContext } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 
-/* Provide safe access to the theme context */
+/* Access global theme state and actions */
 export function useTheme() {
     const context = useContext(ThemeContext);
 
     if (!context) {
-        throw new Error("useTheme must be used within a ThemeProvider");
+        throw new Error("useTheme must be used inside ThemeProvider");
     }
 
     return context;

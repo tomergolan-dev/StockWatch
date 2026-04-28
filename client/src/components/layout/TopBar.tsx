@@ -19,6 +19,7 @@ function TopBar({ onMenuToggle }: TopBarProps) {
 
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     const userMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -38,6 +39,13 @@ function TopBar({ onMenuToggle }: TopBarProps) {
         document.addEventListener("mousedown", handleClick);
         return () => document.removeEventListener("mousedown", handleClick);
     }, [isUserMenuOpen]);
+
+    const handleConfirmLogout = () => {
+        logout();
+        setShowLogoutConfirm(false);
+        setIsUserMenuOpen(false);
+    };
+
 
     return (
         <>
@@ -92,7 +100,7 @@ function TopBar({ onMenuToggle }: TopBarProps) {
 
                                     <button
                                         className="danger"
-                                        onClick={() => logout()}
+                                        onClick={() => setShowLogoutConfirm(true)}
                                     >
                                         Logout
                                     </button>
@@ -114,6 +122,34 @@ function TopBar({ onMenuToggle }: TopBarProps) {
                 isOpen={isNotificationsOpen}
                 onClose={() => setIsNotificationsOpen(false)}
             />
+
+            {showLogoutConfirm ? (
+                <div className="modal-overlay">
+                    <div className="modal-box">
+                        <h3>Log out?</h3>
+
+                        <p>Are you sure you want to log out?</p>
+
+                        <div className="modal-actions">
+                            <button
+                                type="button"
+                                className="auth-secondary-button"
+                                onClick={() => setShowLogoutConfirm(false)}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                className="stock-action-button danger"
+                                onClick={handleConfirmLogout}
+                            >
+                                Log out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </>
     );
 }

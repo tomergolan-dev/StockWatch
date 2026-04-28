@@ -2,8 +2,8 @@ import { AxiosError } from "axios";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import { createAlert } from "../../api/alerts.api";
-import type { CreateAlertPayload } from "../../types/alerts.types";
+import { createAlert } from "../../api/alerts.api.ts";
+import type { CreateAlertPayload } from "../../types/alerts.types.ts";
 
 type CreateAlertModalProps = {
     symbol: string;

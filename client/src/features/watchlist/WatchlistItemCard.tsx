@@ -1,24 +1,29 @@
 import { AxiosError } from "axios";
+import { BellPlus, Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { BellPlus, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { removeFromWatchlist } from "../../api/watchlist.api";
 import type { WatchlistItem } from "../../types/watchlist.types";
-import CreateAlertModal from "./CreateAlertModal";
+import CreateAlertModal from "../alerts/CreateAlertModal.tsx";
 
 type WatchlistItemCardProps = {
     item: WatchlistItem;
     onRemoved: (symbol: string) => void;
 };
 
-/* Display a single watchlist stock card with market data and actions */
+/* Display a watchlist stock card with market data and actions */
 function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
+    const navigate = useNavigate();
+
     const [isRemoving, setIsRemoving] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [showConfirm, setShowConfirm] = useState(false);
     const [showAlertModal, setShowAlertModal] = useState(false);
+    const [logoFailed, setLogoFailed] = useState(false);
 
     const isPositive = item.change >= 0;
+    const logoSrc = `/stock-logos/${item.symbol.toLowerCase()}.png`;
 
     const handleRemove = async () => {
         setIsRemoving(true);
@@ -29,7 +34,7 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
             onRemoved(item.symbol);
             setShowConfirm(false);
         } catch (error: unknown) {
-            let serverMessage = "Failed to remove stock from watchlist.";
+            let serverMessage = "Failed to remove stock.";
 
             if (error instanceof AxiosError) {
                 const responseMessage = error.response?.data?.message;
@@ -47,15 +52,33 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
 
     return (
         <>
-            <article className="watchlist-card market-stock-card">
-                <div className="market-stock-top">
-                    <div>
-                        <h3 className="market-stock-symbol">{item.symbol}</h3>
-                        <p className="market-stock-company">{item.companyName}</p>
+            <article className="watchlist-stock-card">
+                <div className="watchlist-stock-header">
+                    <div className="watchlist-stock-identity">
+                        <div className="watchlist-stock-logo-shell">
+                            {!logoFailed ? (
+                                <img
+                                    src={logoSrc}
+                                    alt={`${item.symbol} logo`}
+                                    className="watchlist-stock-logo"
+                                    loading="lazy"
+                                    onError={() => setLogoFailed(true)}
+                                />
+                            ) : (
+                                <div className="watchlist-stock-logo-fallback">
+                                    {item.symbol.charAt(0)}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="watchlist-stock-title-block">
+                            <h3>{item.symbol}</h3>
+                            <p>{item.companyName}</p>
+                        </div>
                     </div>
 
                     <span
-                        className={`market-stock-change-badge ${
+                        className={`watchlist-stock-change-badge ${
                             isPositive ? "positive" : "negative"
                         }`}
                     >
@@ -64,13 +87,11 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
                     </span>
                 </div>
 
-                <div className="market-stock-price-row">
-                    <span className="market-stock-price">
-                        ${item.currentPrice.toFixed(2)}
-                    </span>
+                <div className="watchlist-stock-price-row">
+                    <strong>${item.currentPrice.toFixed(2)}</strong>
 
                     <span
-                        className={`market-stock-delta ${
+                        className={`watchlist-stock-delta ${
                             isPositive ? "positive" : "negative"
                         }`}
                     >
@@ -79,29 +100,51 @@ function WatchlistItemCard({ item, onRemoved }: WatchlistItemCardProps) {
                     </span>
                 </div>
 
-                <div className="market-stock-meta">
-                    <span>Open ${item.open.toFixed(2)}</span>
-                    <span>High ${item.high.toFixed(2)}</span>
-                    <span>Low ${item.low.toFixed(2)}</span>
+                <div className="watchlist-stock-divider" />
+
+                <div className="watchlist-stock-meta-grid">
+                    <div>
+                        <span>Open</span>
+                        <strong>${item.open.toFixed(2)}</strong>
+                    </div>
+
+                    <div>
+                        <span>High</span>
+                        <strong>${item.high.toFixed(2)}</strong>
+                    </div>
+
+                    <div>
+                        <span>Low</span>
+                        <strong>${item.low.toFixed(2)}</strong>
+                    </div>
                 </div>
 
                 {errorMessage ? (
                     <p className="form-error watchlist-message">{errorMessage}</p>
                 ) : null}
 
-                <div className="market-stock-actions">
+                <div className="watchlist-card-actions">
                     <button
                         type="button"
-                        className="market-stock-action-button"
+                        className="watchlist-alert-button"
                         onClick={() => setShowAlertModal(true)}
                     >
                         <BellPlus size={16} />
-                        <span>Create Alert</span>
+                        <span>Alert</span>
                     </button>
 
                     <button
                         type="button"
-                        className="market-stock-remove-button"
+                        className="watchlist-view-button"
+                        onClick={() => navigate(`/stock/${item.symbol}`)}
+                    >
+                        <Eye size={16} />
+                        <span>View</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className="watchlist-remove-button"
                         onClick={() => setShowConfirm(true)}
                     >
                         <Trash2 size={16} />
