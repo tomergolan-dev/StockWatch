@@ -132,7 +132,7 @@ git clone https://github.com/your-username/StockWatch.git
 cd StockWatch
 npm install
 npm run dev
-
+```
 ---
 
 ## 🧪 Future Improvements
@@ -144,5 +144,4 @@ npm run dev
 
 ## 👨‍💻 Author
 
-Tomer Golan
-Full Stack Developer
+Tomer Golan | Full Stack Developer
