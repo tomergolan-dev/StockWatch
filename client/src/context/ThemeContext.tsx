@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import {
     createContext,
     useCallback,
@@ -6,13 +8,15 @@ import {
     useState,
     type ReactNode,
 } from "react";
+import { getFallbackIsDark, shouldUseDarkBySun } from "../utils/sunTime";
 
-type ThemeMode = "auto" | "light" | "dark";
+export type ThemeMode = "auto" | "light" | "dark";
 
 type ThemeContextValue = {
     themeMode: ThemeMode;
     isDark: boolean;
     toggleTheme: () => void;
+    setThemeMode: (mode: ThemeMode) => void;
     setAutoTheme: () => void;
 };
 
@@ -30,160 +34,54 @@ const THEME_MODE_KEY = "themeMode";
 export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function getStoredThemeMode(): ThemeMode {
-    const storedThemeMode = localStorage.getItem(THEME_MODE_KEY);
+    const stored = localStorage.getItem(THEME_MODE_KEY);
 
-    if (
-        storedThemeMode === "auto" ||
-        storedThemeMode === "light" ||
-        storedThemeMode === "dark"
-    ) {
-        return storedThemeMode;
+    if (stored === "auto" || stored === "light" || stored === "dark") {
+        return stored;
     }
 
     return "auto";
 }
 
-function getFallbackIsDark() {
-    const currentHour = new Date().getHours();
-
-    return currentHour < 6 || currentHour >= 19;
-}
-
-/* Calculate sunrise or sunset in local hours using latitude and longitude */
-function calculateSunTime(
-    latitude: number,
-    longitude: number,
-    isSunrise: boolean
-) {
-    const date = new Date();
-    const dayStart = new Date(date.getFullYear(), 0, 0);
-    const dayOfYear = Math.floor(
-        (date.getTime() - dayStart.getTime()) / 1000 / 60 / 60 / 24
-    );
-
-    const lngHour = longitude / 15;
-    const approximateTime = isSunrise
-        ? dayOfYear + (6 - lngHour) / 24
-        : dayOfYear + (18 - lngHour) / 24;
-
-    const meanAnomaly = 0.9856 * approximateTime - 3.289;
-
-    let trueLongitude =
-        meanAnomaly +
-        1.916 * Math.sin((Math.PI / 180) * meanAnomaly) +
-        0.02 * Math.sin((Math.PI / 180) * 2 * meanAnomaly) +
-        282.634;
-
-    trueLongitude = (trueLongitude + 360) % 360;
-
-    let rightAscension =
-        (180 / Math.PI) *
-        Math.atan(0.91764 * Math.tan((Math.PI / 180) * trueLongitude));
-
-    rightAscension = (rightAscension + 360) % 360;
-
-    const longitudeQuadrant = Math.floor(trueLongitude / 90) * 90;
-    const rightAscensionQuadrant = Math.floor(rightAscension / 90) * 90;
-
-    rightAscension += longitudeQuadrant - rightAscensionQuadrant;
-    rightAscension /= 15;
-
-    const sinDeclination =
-        0.39782 * Math.sin((Math.PI / 180) * trueLongitude);
-    const cosDeclination = Math.cos(Math.asin(sinDeclination));
-
-    const zenith = 90.833;
-
-    const localHourCosine =
-        (Math.cos((Math.PI / 180) * zenith) -
-            sinDeclination * Math.sin((Math.PI / 180) * latitude)) /
-        (cosDeclination * Math.cos((Math.PI / 180) * latitude));
-
-    if (localHourCosine > 1 || localHourCosine < -1) {
-        return null;
-    }
-
-    const localHour = isSunrise
-        ? 360 - (180 / Math.PI) * Math.acos(localHourCosine)
-        : (180 / Math.PI) * Math.acos(localHourCosine);
-
-    const localHourInHours = localHour / 15;
-
-    const localMeanTime =
-        localHourInHours + rightAscension - 0.06571 * approximateTime - 6.622;
-
-    const utcTime = (localMeanTime - lngHour + 24) % 24;
-    const timezoneOffset = -date.getTimezoneOffset() / 60;
-
-    return (utcTime + timezoneOffset + 24) % 24;
-}
-
-function shouldUseDarkBySun(latitude: number, longitude: number) {
-    const sunrise = calculateSunTime(latitude, longitude, true);
-    const sunset = calculateSunTime(latitude, longitude, false);
-
-    if (sunrise === null || sunset === null) {
-        return getFallbackIsDark();
-    }
-
-    const now = new Date();
-    const currentTime = now.getHours() + now.getMinutes() / 60;
-
-    return currentTime < sunrise || currentTime >= sunset;
-}
-
-/* Provide global theme state with persisted manual preference and auto mode */
 export function ThemeProvider({ children }: ThemeProviderProps) {
-    const [themeMode, setThemeMode] = useState<ThemeMode>(() =>
+    const [themeMode, setThemeModeState] = useState<ThemeMode>(
         getStoredThemeMode()
     );
-    const [autoIsDark, setAutoIsDark] = useState(() => getFallbackIsDark());
-    const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+
+    const [autoIsDark, setAutoIsDark] = useState<boolean>(
+        getFallbackIsDark()
+    );
+
+    const [coords, setCoords] = useState<Coordinates | null>(null);
 
     const isDark =
         themeMode === "dark" || (themeMode === "auto" && autoIsDark);
 
-    /* Cycle theme mode: auto -> light -> dark -> auto */
-    const toggleTheme = useCallback(() => {
-        setThemeMode((currentMode) => {
-            let nextMode: ThemeMode;
-
-            if (currentMode === "auto") {
-                nextMode = "light";
-            } else if (currentMode === "light") {
-                nextMode = "dark";
-            } else {
-                nextMode = "auto";
-            }
-
-            localStorage.setItem(THEME_MODE_KEY, nextMode);
-
-            return nextMode;
-        });
+    const setThemeMode = useCallback((mode: ThemeMode) => {
+        localStorage.setItem(THEME_MODE_KEY, mode);
+        setThemeModeState(mode);
     }, []);
 
     const setAutoTheme = useCallback(() => {
-        localStorage.setItem(THEME_MODE_KEY, "auto");
         setThemeMode("auto");
-    }, []);
+    }, [setThemeMode]);
+
+    const toggleTheme = useCallback(() => {
+        setThemeMode(isDark ? "light" : "dark");
+    }, [isDark, setThemeMode]);
 
     const updateAutoTheme = useCallback(
-        (nextCoordinates?: Coordinates | null) => {
-            const activeCoordinates = nextCoordinates ?? coordinates;
-
-            if (!activeCoordinates) {
+        (position: Coordinates | null) => {
+            if (!position) {
                 setAutoIsDark(getFallbackIsDark());
                 return;
             }
 
             setAutoIsDark(
-                shouldUseDarkBySun(
-                    activeCoordinates.latitude,
-                    activeCoordinates.longitude
-                )
+                shouldUseDarkBySun(position.latitude, position.longitude)
             );
         },
-        [coordinates]
+        []
     );
 
     useEffect(() => {
@@ -194,9 +92,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     }, [isDark]);
 
     useEffect(() => {
-        if (themeMode !== "auto") {
-            return;
-        }
+        if (themeMode !== "auto") return;
 
         if (!navigator.geolocation) {
             updateAutoTheme(null);
@@ -204,44 +100,38 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         }
 
         navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const nextCoordinates = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
+            (pos) => {
+                const newCoords = {
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
                 };
 
-                setCoordinates(nextCoordinates);
-                updateAutoTheme(nextCoordinates);
+                setCoords(newCoords);
+                updateAutoTheme(newCoords);
             },
-            () => updateAutoTheme(null),
-            {
-                enableHighAccuracy: false,
-                maximumAge: 1000 * 60 * 60,
-                timeout: 5000,
-            }
+            () => updateAutoTheme(null)
         );
     }, [themeMode, updateAutoTheme]);
 
     useEffect(() => {
-        if (themeMode !== "auto") {
-            return;
-        }
+        if (themeMode !== "auto") return;
 
-        const intervalId = window.setInterval(() => {
-            updateAutoTheme();
-        }, 60 * 1000);
+        const interval = setInterval(() => {
+            updateAutoTheme(coords);
+        }, 60000);
 
-        return () => window.clearInterval(intervalId);
-    }, [themeMode, updateAutoTheme]);
+        return () => clearInterval(interval);
+    }, [themeMode, coords, updateAutoTheme]);
 
     const value = useMemo(
         () => ({
             themeMode,
             isDark,
             toggleTheme,
+            setThemeMode,
             setAutoTheme,
         }),
-        [themeMode, isDark, toggleTheme, setAutoTheme]
+        [themeMode, isDark, toggleTheme, setThemeMode, setAutoTheme]
     );
 
     return (

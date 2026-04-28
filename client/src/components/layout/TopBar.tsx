@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Bell, Menu, SunMoon, Moon, Sun, User } from "lucide-react";
+import { Bell, Menu, Moon, Sun, SunMoon, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import NotificationsPanel from "../../features/notifications/NotificationsPanel";
 import { useAuth } from "../../hooks/useAuth";
@@ -12,7 +12,8 @@ type TopBarProps = {
 
 function TopBar({ onMenuToggle }: TopBarProps) {
     const { isAuthenticated, user, logout } = useAuth();
-    const { isDark, themeMode, toggleTheme } = useTheme();
+    const { isDark, themeMode, toggleTheme, setThemeMode, setAutoTheme } =
+        useTheme();
     const navigate = useNavigate();
 
     const { unreadCount } = useNotifications();
@@ -24,13 +25,12 @@ function TopBar({ onMenuToggle }: TopBarProps) {
     const userMenuRef = useRef<HTMLDivElement | null>(null);
 
     const displayName = user?.firstName || user?.email || "User";
+    const isAutoTheme = themeMode === "auto";
+    const resolvedThemeLabel = isDark ? "Dark" : "Light";
 
-    const themeLabel =
-        themeMode === "auto"
-            ? `Theme: Auto (${isDark ? "Dark" : "Light"})`
-            : themeMode === "dark"
-                ? "Theme: Dark"
-                : "Theme: Light";
+    const themeTitle = isAutoTheme
+        ? `Theme: Auto (${resolvedThemeLabel})`
+        : `Theme: ${resolvedThemeLabel}`;
 
     useEffect(() => {
         if (!isUserMenuOpen) {
@@ -49,6 +49,15 @@ function TopBar({ onMenuToggle }: TopBarProps) {
 
         return () => document.removeEventListener("mousedown", handleClick);
     }, [isUserMenuOpen]);
+
+    const handleAutoThemeToggle = () => {
+        if (isAutoTheme) {
+            setThemeMode(isDark ? "dark" : "light");
+            return;
+        }
+
+        setAutoTheme();
+    };
 
     const handleConfirmLogout = () => {
         logout();
@@ -75,21 +84,36 @@ function TopBar({ onMenuToggle }: TopBarProps) {
                 </div>
 
                 <div className="topbar-right">
-                    <button
-                        type="button"
-                        className="icon-button"
-                        onClick={toggleTheme}
-                        title={themeLabel}
-                        aria-label={themeLabel}
-                    >
-                        {themeMode === "auto" ? (
-                            <SunMoon size={18} />
-                        ) : isDark ? (
-                            <Sun size={18} />
-                        ) : (
-                            <Moon size={18} />
-                        )}
-                    </button>
+                    <div className="theme-toggle-group" title={themeTitle}>
+                        <button
+                            type="button"
+                            className={`theme-toggle-segment ${
+                                isAutoTheme ? "active" : ""
+                            }`}
+                            onClick={handleAutoThemeToggle}
+                            aria-label={
+                                isAutoTheme
+                                    ? "Disable auto theme"
+                                    : "Enable auto theme"
+                            }
+                        >
+                            <SunMoon size={16} />
+                            <span>Auto</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            className={`theme-toggle-segment ${
+                                !isAutoTheme ? "active" : ""
+                            }`}
+                            onClick={toggleTheme}
+                            disabled={isAutoTheme}
+                            aria-label={`Current theme: ${resolvedThemeLabel}`}
+                        >
+                            {isDark ? <Moon size={16} /> : <Sun size={16} />}
+                            <span>{resolvedThemeLabel}</span>
+                        </button>
+                    </div>
 
                     {isAuthenticated ? (
                         <button
@@ -118,7 +142,9 @@ function TopBar({ onMenuToggle }: TopBarProps) {
                                 }
                             >
                                 <User size={16} />
-                                <span>{displayName}</span>
+                                <span className="user-chip-text">
+                                    {displayName}
+                                </span>
                             </button>
 
                             {isUserMenuOpen ? (

@@ -624,3 +624,34 @@
         max-width: 100px;
     }
 }
+
+.theme-toggle-group {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-color);
+}
+
+.theme-toggle-segment {
+    padding: 6px 10px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.theme-toggle-segment.active {
+    background: var(--bg-secondary);
+    color: var(--accent-primary);
+}
+
+.theme-toggle-segment:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
