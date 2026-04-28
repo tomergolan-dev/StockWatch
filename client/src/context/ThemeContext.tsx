@@ -20,6 +20,11 @@ type ThemeProviderProps = {
     children: ReactNode;
 };
 
+type Coordinates = {
+    latitude: number;
+    longitude: number;
+};
+
 const THEME_MODE_KEY = "themeMode";
 
 export const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -133,13 +138,24 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         getStoredThemeMode()
     );
     const [autoIsDark, setAutoIsDark] = useState(() => getFallbackIsDark());
+    const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
 
     const isDark =
         themeMode === "dark" || (themeMode === "auto" && autoIsDark);
 
+    /* Cycle theme mode: auto -> light -> dark -> auto */
     const toggleTheme = useCallback(() => {
         setThemeMode((currentMode) => {
-            const nextMode = currentMode === "dark" ? "light" : "dark";
+            let nextMode: ThemeMode;
+
+            if (currentMode === "auto") {
+                nextMode = "light";
+            } else if (currentMode === "light") {
+                nextMode = "dark";
+            } else {
+                nextMode = "auto";
+            }
+
             localStorage.setItem(THEME_MODE_KEY, nextMode);
 
             return nextMode;
@@ -150,6 +166,25 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         localStorage.setItem(THEME_MODE_KEY, "auto");
         setThemeMode("auto");
     }, []);
+
+    const updateAutoTheme = useCallback(
+        (nextCoordinates?: Coordinates | null) => {
+            const activeCoordinates = nextCoordinates ?? coordinates;
+
+            if (!activeCoordinates) {
+                setAutoIsDark(getFallbackIsDark());
+                return;
+            }
+
+            setAutoIsDark(
+                shouldUseDarkBySun(
+                    activeCoordinates.latitude,
+                    activeCoordinates.longitude
+                )
+            );
+        },
+        [coordinates]
+    );
 
     useEffect(() => {
         document.documentElement.setAttribute(
@@ -163,32 +198,41 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
             return;
         }
 
-        const updateByFallbackTime = () => {
-            setAutoIsDark(getFallbackIsDark());
-        };
-
         if (!navigator.geolocation) {
-            updateByFallbackTime();
+            updateAutoTheme(null);
             return;
         }
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                setAutoIsDark(
-                    shouldUseDarkBySun(
-                        position.coords.latitude,
-                        position.coords.longitude
-                    )
-                );
+                const nextCoordinates = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                };
+
+                setCoordinates(nextCoordinates);
+                updateAutoTheme(nextCoordinates);
             },
-            updateByFallbackTime,
+            () => updateAutoTheme(null),
             {
                 enableHighAccuracy: false,
                 maximumAge: 1000 * 60 * 60,
                 timeout: 5000,
             }
         );
-    }, [themeMode]);
+    }, [themeMode, updateAutoTheme]);
+
+    useEffect(() => {
+        if (themeMode !== "auto") {
+            return;
+        }
+
+        const intervalId = window.setInterval(() => {
+            updateAutoTheme();
+        }, 60 * 1000);
+
+        return () => window.clearInterval(intervalId);
+    }, [themeMode, updateAutoTheme]);
 
     const value = useMemo(
         () => ({
